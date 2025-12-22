@@ -1,0 +1,261 @@
+{
+  "name": "Tigube Kontaktformular zu Supabase",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "contact",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-node",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1.1,
+      "position": [250, 300],
+      "webhookId": "contact-form-webhook"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.body.name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "condition-2",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "condition-3",
+              "leftValue": "={{ $json.body.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-node",
+      "name": "Validierung",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Daten für Supabase vorbereiten\nconst body = $input.item.json.body;\n\n// Datum konvertieren (von ISO-String zu YYYY-MM-DD)\nfunction formatDate(dateString) {\n  if (!dateString) return null;\n  if (dateString.includes('T')) {\n    return dateString.split('T')[0];\n  }\n  return dateString;\n}\n\nconst supabaseData = {\n  name: body.name,\n  vorname: body.vorname || null,\n  email: body.email,\n  phone: body.phone,\n  service: body.service,\n  pet: body.pet || null,\n  message: body.message,\n  availability: body.availability,\n  privacy: body.privacy || false,\n  anzahl_tiere: body.anzahlTiere || null,\n  tiernamen: body.tiernamen || null,\n  schulferien_bw: body.schulferienBW || false,\n  konkreter_urlaub: body.konkreterUrlaub || null,\n  urlaub_von: formatDate(body.urlaubVon),\n  urlaub_bis: formatDate(body.urlaubBis),\n  intakt_kastriert: body.intaktKastriert || null,\n  alter_tier: body.alter || null,\n  ip_address: body.ip || null,\n  user_agent: body.userAgent || null,\n  timestamp: body.timestamp || new Date().toISOString()\n};\n\nreturn { json: supabaseData };"
+      },
+      "id": "code-node",
+      "name": "Daten vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://tpbdujrhdahtclmcdrvc.supabase.co/rest/v1/contact_requests",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwYmR1anJoZGFodGNsbWNkcnZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODgzNDgsImV4cCI6MjA3NTk2NDM0OH0.2ih_5As4qg4en6dqPzM7ve_s_Qj54DRSvYy45Ijocu8"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRwYmR1anJoZGFodGNsbWNkcnZjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAzODgzNDgsImV4cCI6MjA3NTk2NDM0OH0.2ih_5As4qg4en6dqPzM7ve_s_Qj54DRSvYy45Ijocu8"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "Prefer",
+              "value": "return=representation"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "supabase-http",
+      "name": "Supabase Insert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Anfrage erfolgreich gespeichert\", \"id\": $json[0].id } }}",
+        "options": {}
+      },
+      "id": "respond-success",
+      "name": "Erfolg Antwort",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"error\": \"Pflichtfelder fehlen\" } }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "respond-error",
+      "name": "Fehler Antwort",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": false, \"error\": \"Fehler beim Speichern in Datenbank\", \"details\": $json.error?.message || $json.message || JSON.stringify($json) } }}",
+        "options": {
+          "responseCode": 500
+        }
+      },
+      "id": "respond-db-error",
+      "name": "DB Fehler Antwort",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition-1",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-error",
+      "name": "Fehler prüfen",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1050, 200]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validierung",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validierung": {
+      "main": [
+        [
+          {
+            "node": "Daten vorbereiten",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fehler Antwort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daten vorbereiten": {
+      "main": [
+        [
+          {
+            "node": "Supabase Insert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Insert": {
+      "main": [
+        [
+          {
+            "node": "Fehler prüfen",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fehler prüfen": {
+      "main": [
+        [
+          {
+            "node": "Erfolg Antwort",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "DB Fehler Antwort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-01-15T12:00:00.000Z",
+  "versionId": "1"
+}

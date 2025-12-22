@@ -1,0 +1,166 @@
+# Tigube Homepage - Projektintelligenz
+
+## Projektkontext
+- **Tierbetreuungsservice** in Moos namens "Tierisch Gut Betreut"
+- **Zielgruppe**: Berufstätige Tierbesitzer, Urlauber, Notfallsituationen
+- **Hauptziel**: Vertrauen schaffen und Kontaktanfragen generieren
+
+## Technische Architektur
+
+### Stack-Präferenzen
+- **Next.js 15** mit App Router (nicht Pages Router)
+- **TypeScript** für alle neuen Dateien
+- **Tailwind CSS** für Styling (keine CSS Module)
+- **Radix UI** für Komponenten (shadcn/ui Pattern)
+- **Lucide React** für Icons
+
+### Komponenten-Patterns
+```tsx
+// Bevorzugtes Komponenten-Pattern
+export function ComponentName() {
+  return (
+    <section className="py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Content */}
+      </div>
+    </section>
+  )
+}
+```
+
+### Styling-Conventions
+- **Container**: `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`
+- **Section Spacing**: `py-16 lg:py-24`
+- **Sage-Farbpalette**: Primärfarben für Vertrauen und Natur
+- **Responsive Grid**: `grid md:grid-cols-2 lg:grid-cols-4`
+
+## Design-System
+
+### Farbschema
+- **Sage-600**: Primärfarbe für Buttons und Akzente
+- **Sage-50/100**: Hintergründe für Sektionen
+- **Sage-900**: Dunkle Texte und Headlines
+- **Gray-600**: Sekundäre Texte
+
+### Typographie
+- **Raleway**: Headlines und wichtige Texte
+- **font-raleway**: CSS-Variable für Raleway
+- **Gewichte**: 400 (normal), 700 (bold), 900 (black)
+
+### Button-Patterns
+```tsx
+// Primär-Button
+<Button className="bg-sage-600 hover:bg-sage-700 text-white">
+
+// Sekundär-Button  
+<Button variant="outline" className="border-sage-300 text-sage-700 hover:bg-sage-50">
+```
+
+## Content-Patterns
+
+### Services-Struktur
+1. **Hundepension** (ab 35€/Tag)
+2. **Mobile Katzenbetreuung** (ab 18€/Besuch)
+3. **Tagesbetreuung** (ab 25€/Tag)
+4. **Notfallbetreuung** (auf Anfrage)
+
+### Vertrauenselemente
+- **Versichert & zertifiziert**
+- **200+ zufriedene Kunden**
+- **4.9/5 Sterne Bewertung**
+- **Über 10 Jahre Erfahrung**
+
+### Kernbotschaften
+- Verlässlichkeit und Sicherheit
+- Individuelle Betreuung
+- Lokaler Moos-Bezug
+- Transparente Preise
+
+## Entwicklungsrichtlinien
+
+### Dateierstellung
+- Neue Komponenten in `/components/`
+- Utility-Funktionen in `/lib/`
+- Custom Hooks in `/hooks/`
+- Seiten in `/app/` (App Router)
+
+### Code-Qualität
+- TypeScript strict mode
+- Functional Components mit Hooks
+- Proper error handling
+- Accessible HTML (ARIA-Labels)
+
+### Performance
+- Next.js Image-Komponente für Bilder
+- Lazy Loading für große Komponenten
+- Optimierte Bundle-Größe
+
+## Häufige Aufgaben
+
+### Content-Updates
+- Preise in `components/services.tsx`
+- Testimonials in `components/testimonials.tsx`
+- Kontaktdaten in `components/contact.tsx` und `components/footer.tsx`
+
+### Neue Sektionen
+- Konsistente Section-Struktur verwenden
+- Responsive Design berücksichtigen
+- Sage-Farbpalette beibehalten
+
+### SEO-Optimierung
+- Metadata in `app/layout.tsx`
+- Strukturierte Daten für lokale Geschäfte
+- Alt-Texte für alle Bilder
+
+## Bekannte Herausforderungen
+
+### Kontaktformular
+- Aktuell nur UI, keine Backend-Funktionalität
+- Zukünftige Integration mit Email-Service nötig
+
+### Bildmaterial
+- Placeholder-Bilder durch echte Fotos ersetzen
+- Optimierung für verschiedene Bildschirmgrößen
+
+### Mobile Experience
+- Navigation könnte verbessert werden
+- Touch-Friendly Buttons und Spacing
+
+## Memory Bank Integration
+
+### Dokumentation
+- Alle Änderungen in Memory Bank dokumentieren
+- `activeContext.md` bei neuen Features aktualisieren
+- `progress.md` bei Meilensteinen updaten
+
+### Arbeitsweise
+1. Memory Bank lesen vor jeder Aufgabe
+2. Bestehende Patterns befolgen
+3. Dokumentation nach Änderungen aktualisieren
+4. Konsistenz über alle Komponenten hinweg
+
+## Deployment
+
+### Vercel-Integration
+- Automatisches Deployment bei Git Push
+- Preview-Deployments für Branches
+- Optimierte Performance durch Edge Network
+
+### Git-Workflow
+- Feature-Branches für größere Änderungen
+- Descriptive Commit-Messages
+- package-lock.json committen (aktuell untracked)
+
+## Zukünftige Erweiterungen
+
+### Geplante Features
+- Funktionales Kontaktformular
+- FAQ-Sektion
+- Detaillierte Leistungen-Seite
+- Buchungssystem (optional)
+
+### Optimierungen
+- Strukturierte Daten für SEO
+- Analytics-Integration
+- Performance-Monitoring
+- A/B-Testing für Conversion 

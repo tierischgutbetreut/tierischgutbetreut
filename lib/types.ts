@@ -1,0 +1,207 @@
+// Database Types
+
+export interface User {
+  id: string
+  email: string
+  role: 'admin' | 'customer'
+  created_at: string
+  updated_at: string
+}
+
+export interface Customer {
+  id: string
+  user_id: string | null
+  kundennummer: string | null
+  nachname: string
+  vorname: string
+  email: string
+  telefonnummer: string | null
+  telefon_2: string | null
+  notfall_kontakt_name: string | null
+  notfallnummer: string | null
+  futtermenge: string | null
+  medikamente: string | null
+  besonderheiten: string | null
+  intervall_impfung: string | null
+  intervall_entwurmung: string | null
+  datenschutz: boolean
+  onboarding_completed: boolean
+  status: 'pending' | 'active'
+  created_at: string
+  updated_at: string
+}
+
+export interface Pet {
+  id: string
+  customer_id: string
+  name: string
+  tierart: string | null
+  geschlecht: string | null
+  letzte_impfung: string | null
+  letzte_impfung_zusatz: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Document {
+  id: string
+  customer_id: string
+  pet_id: string | null
+  document_type: 'vertrag' | 'impfpass' | 'wurmtest'
+  file_path: string
+  file_name: string
+  file_size: number | null
+  mime_type: string | null
+  uploaded_at: string
+  created_at: string
+}
+
+export interface OnboardingToken {
+  id: string
+  contact_request_id: number
+  token: string
+  expires_at: string
+  used: boolean
+  used_at: string | null
+  created_at: string
+}
+
+export interface LeadNote {
+  id: string
+  contact_request_id: number
+  note: string
+  created_by: string | {
+    email: string
+    role: string
+  }
+  created_at: string
+  updated_at: string
+}
+
+export interface CustomerNote {
+  id: string
+  customer_id: string
+  note: string
+  created_by: string | {
+    email: string
+    role: string
+  }
+  created_at: string
+  updated_at: string
+}
+
+export interface ContactRequest {
+  id: number
+  name: string
+  vorname: string | null
+  email: string
+  phone: string
+  service: string
+  pet: string | null
+  message: string
+  availability: string
+  privacy: boolean
+  anzahl_tiere: string | null
+  tiernamen: string | null
+  schulferien_bw: boolean | null
+  konkreter_urlaub: string | null
+  urlaub_von: string | null
+  urlaub_bis: string | null
+  intakt_kastriert: string | null
+  alter_tier: string | null
+  ip_address: string | null
+  user_agent: string | null
+  timestamp: string
+  created_at: string
+  updated_at: string
+  // Neue Felder
+  status: 'new' | 'contacted' | 'converted' | 'declined'
+  properties: Record<string, any>
+  assigned_to: string | null
+}
+
+// Testimonial type definition
+export interface Testimonial {
+  id: string
+  name: string
+  pet: string | null
+  rating: number
+  text: string
+  date: string
+  is_published: boolean
+  display_order: number
+  created_at: string
+  updated_at: string
+}
+
+// Google Reviews Types
+export interface GoogleReview {
+  author_name: string
+  author_url?: string
+  profile_photo_url?: string
+  rating: number
+  relative_time_description: string
+  text: string
+  time: number // Unix timestamp
+}
+
+export interface GooglePlaceDetails {
+  place_id: string
+  name: string
+  rating: number
+  user_ratings_total: number
+  reviews: GoogleReview[]
+  url: string // Google Maps URL
+}
+
+export interface GoogleReviewsResponse {
+  success: boolean
+  data?: GooglePlaceDetails
+  error?: string
+  cached?: boolean
+  lastUpdated?: string
+}
+
+// Combined review type for display
+export interface CombinedReview {
+  id: string
+  name: string
+  pet: string | null
+  rating: number
+  text: string
+  date: string
+  source: 'local' | 'google'
+  profilePhoto?: string
+  authorUrl?: string
+}
+
+// Property System Types
+export type PropertyFieldType = 'text' | 'number' | 'date' | 'select' | 'checkbox' | 'textarea'
+
+export interface PropertyDefinition {
+  id: string
+  name: string
+  label: string
+  field_type: PropertyFieldType
+  options: string[]
+  required: boolean
+  applies_to: ('lead' | 'customer')[]
+  sort_order: number
+  created_at: string
+  updated_at: string
+}
+
+export interface PropertyValue {
+  id: string
+  property_definition_id: string
+  entity_type: 'lead' | 'customer'
+  entity_id: string
+  value_text: string | null
+  value_number: number | null
+  value_date: string | null
+  value_boolean: boolean | null
+  created_at: string
+  updated_at: string
+  // Joined data
+  property_definition?: PropertyDefinition
+}
