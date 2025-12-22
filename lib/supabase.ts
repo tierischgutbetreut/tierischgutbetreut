@@ -28,7 +28,32 @@ function getSupabaseClient(): SupabaseClient {
   return supabaseClient
 }
 
-export const supabase = getSupabaseClient()
+// Create a proxy that lazily initializes the client only when accessed
+// This prevents the client from being created during module import/build time
+const supabaseProxy = new Proxy({} as SupabaseClient, {
+  get(_target, prop) {
+    const client = getSupabaseClient()
+    const value = (client as any)[prop]
+    if (typeof value === 'function') {
+      return value.bind(client)
+    }
+    return value
+  },
+  has(_target, prop) {
+    const client = getSupabaseClient()
+    return prop in client
+  },
+  ownKeys(_target) {
+    const client = getSupabaseClient()
+    return Reflect.ownKeys(client)
+  },
+  getOwnPropertyDescriptor(_target, prop) {
+    const client = getSupabaseClient()
+    return Reflect.getOwnPropertyDescriptor(client, prop)
+  }
+})
+
+export const supabase = supabaseProxy
 
 import type { Testimonial } from './types'
 
