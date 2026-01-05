@@ -1,37 +1,101 @@
-# Tierbetreuung webdesign
+# Tigube Homepage - Tierbetreuungsservice Website
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+Professionelle Website für "Tierisch Gut Betreut" - einen Tierbetreuungsservice in Moos. Die Website dient als digitale Visitenkarte und Kundenakquise-Tool für den Tierbetreuungsservice.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/tigubes-projects/v0-tierbetreuung-webdesign)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/nsJHaZ0ySzW)
+## Projektübersicht
 
-## Overview
+Diese Website wurde entwickelt, um Vertrauen zu schaffen und Kontaktanfragen für den Tierbetreuungsservice zu generieren. Sie richtet sich an Tierbesitzer in Moos und Umgebung, die professionelle Betreuung für ihre Haustiere benötigen.
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+### Kernfunktionen
 
-## Deployment
+- **Landingpage** mit Hero-Bereich und Vertrauensindikatoren
+- **Services-Übersicht** mit Preisen und Features
+- **Über uns** Sektion für Vertrauen und Glaubwürdigkeit
+- **Kundenbewertungen** als Social Proof
+- **Kontaktformular** für Anfragen
+- **Admin-Bereich** für Verwaltung von Kunden, Leads und Inhalten
+- **Kundenportal** für registrierte Kunden
+- **Responsive Design** für alle Geräte
 
-Your project is live at:
+### Services
 
-**[https://vercel.com/tigubes-projects/v0-tierbetreuung-webdesign](https://vercel.com/tigubes-projects/v0-tierbetreuung-webdesign)**
+1. **Hundepension** (ab 35€/Tag) - Betreuung im hundefreundlichen Zuhause
+2. **Mobile Katzenbetreuung** (ab 18€/Besuch) - Katze bleibt in gewohnter Umgebung
+3. **Tagesbetreuung** (ab 25€/Tag) - Flexible Betreuung für Berufstätige
+4. **Notfallbetreuung** (auf Anfrage) - 24h Erreichbarkeit
 
-## Build your app
+## Technologie-Stack
 
-Continue building your app on:
+### Frontend
+- **Next.js 15.2.4** mit App Router
+- **React 19** - UI Library
+- **TypeScript** - Typsicherheit
+- **Tailwind CSS** - Utility-First CSS Framework
+- **Radix UI** - Accessible UI Primitives
+- **shadcn/ui** - Wiederverwendbare Komponenten
+- **Lucide React** - Icon Library
 
-**[https://v0.dev/chat/projects/nsJHaZ0ySzW](https://v0.dev/chat/projects/nsJHaZ0ySzW)**
+### Backend & Datenbank
+- **Supabase** - PostgreSQL-Datenbank
+- **Next.js API Routes** - Server-Side API-Endpoints
+- **Resend** - E-Mail-Versand
 
-## How It Works
+## Entwicklung
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+### Voraussetzungen
+
+- Node.js 18+ oder höher
+- pnpm oder npm
+- Supabase-Projekt
+
+### Installation
+
+```bash
+# Dependencies installieren
+pnpm install
+# oder
+npm install
+```
+
+### Entwicklungsserver starten
+
+```bash
+# Development Server starten
+pnpm dev
+# oder
+npm run dev
+```
+
+Die Anwendung läuft dann unter [http://localhost:3000](http://localhost:3000)
+
+### Build für Produktion
+
+```bash
+# Production Build erstellen
+pnpm build
+# oder
+npm run build
+
+# Production Server starten
+pnpm start
+# oder
+npm start
+```
+
+### Code-Qualität
+
+```bash
+# Linting
+pnpm lint
+# oder
+npm run lint
+```
 
 ## Umgebungsvariablen
 
 ### Erforderlich
+
+Erstelle eine `.env.local` Datei im Root-Verzeichnis mit folgenden Variablen:
 
 | Variable | Beschreibung |
 |----------|--------------|
@@ -68,3 +132,76 @@ Für die Integration von Google Bewertungen:
 - Google bietet **200$/Monat Freikontingent**
 - Place Details Request: **$0.017 pro Anfrage**
 - Mit 1h-Caching: ca. 720 Anfragen/Monat = ~**$12/Monat**
+
+## Projektstruktur
+
+```
+projekt_tigube_homepage/
+├── app/                    # Next.js App Router
+│   ├── admin/             # Admin-Bereich
+│   ├── api/               # API Routes
+│   ├── portal/            # Kundenportal
+│   └── page.tsx           # Homepage
+├── components/            # React Komponenten
+│   ├── admin/            # Admin-Komponenten
+│   ├── auth/             # Authentifizierung
+│   └── ui/               # UI-Komponenten (shadcn/ui)
+├── lib/                  # Utilities und Helper
+├── hooks/                # Custom React Hooks
+├── public/               # Statische Assets
+├── memory-bank/          # Projektdokumentation
+└── styles/               # Globale Styles
+```
+
+## Features im Detail
+
+### Admin-Bereich
+- Dashboard mit Übersicht
+- Kundenverwaltung
+- Lead-Management
+- Testimonials-Verwaltung
+- Newsbar-Verwaltung
+- Eigenschaften-Verwaltung
+
+### Kundenportal
+- Profil-Verwaltung
+- Haustiere-Verwaltung
+- Dokumente-Verwaltung
+
+### Öffentliche Seiten
+- Homepage mit Services
+- Hundepension Detailseite
+- Katzenbetreuung Detailseite
+- Kundenstimmen
+- Impressum
+
+## Design-System
+
+### Farbpalette
+- **Sage-600**: Primärfarbe für Buttons und Akzente
+- **Sage-50/100**: Hintergründe für Sektionen
+- **Sage-900**: Dunkle Texte und Headlines
+- **Gray-600**: Sekundäre Texte
+
+### Typographie
+- **Raleway**: Headlines und wichtige Texte
+- Responsive Schriftgrößen mit Tailwind
+
+## Sicherheit
+
+- **Row Level Security (RLS)** in Supabase aktiviert
+- Validierung auf Client- und Server-Side
+- Sichere Formular-Übertragung
+- Authentifizierung für Admin- und Portal-Bereiche
+
+## Browser-Unterstützung
+
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
+- Mobile Browser (iOS Safari, Chrome Mobile)
+
+## Lizenz
+
+Privat - Alle Rechte vorbehalten
