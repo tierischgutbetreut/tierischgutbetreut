@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (!userData) {
-      return NextResponse.json({ pets: [] })
+      return NextResponse.json({ bookings: [] })
     }
 
     // Hole Customer-ID
@@ -82,24 +82,45 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (!customer) {
-      return NextResponse.json({ pets: [] })
+      return NextResponse.json({ bookings: [] })
     }
 
-    const { data, error } = await supabase
-      .from('pets')
-      .select('*')
+    // Parse query parameters für Filter
+    const { searchParams } = new URL(request.url)
+    const filter = searchParams.get('filter') // 'past', 'current', 'future'
+
+    let query = supabase
+      .from('bookings')
+      .select(`
+        *,
+        pet:pets(id, name, tierart),
+        customer:customers(id, vorname, nachname)
+      `)
       .eq('customer_id', customer.id)
-      .order('created_at', { ascending: false })
+      .order('start_date', { ascending: false })
+
+    // Filter nach Zeitraum
+    const today = new Date().toISOString().split('T')[0]
+    
+    if (filter === 'past') {
+      query = query.lt('end_date', today)
+    } else if (filter === 'current') {
+      query = query.lte('start_date', today).gte('end_date', today)
+    } else if (filter === 'future') {
+      query = query.gt('start_date', today)
+    }
+
+    const { data, error } = await query
 
     if (error) {
       throw error
     }
 
-    return NextResponse.json({ pets: data || [] })
+    return NextResponse.json({ bookings: data || [] })
   } catch (error: any) {
-    console.error('Error fetching pets:', error)
+    console.error('Error fetching bookings:', error)
     return NextResponse.json(
-      { error: error.message || 'Fehler beim Laden der Tiere' },
+      { error: error.message || 'Fehler beim Laden der Buchungen' },
       { status: 500 }
     )
   }
@@ -152,29 +173,68 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const petData = await request.json()
+    const bookingData = await request.json()
+    const { pet_id, service_type, start_date, end_date, message } = bookingData
+
+    // Validierung
+    if (!pet_id || !service_type || !start_date || !end_date) {
+      return NextResponse.json(
+        { error: 'Pflichtfelder fehlen' },
+        { status: 400 }
+      )
+    }
+
+    // Prüfe ob das Tier dem Kunden gehört
+    const { data: pet, error: petError } = await supabase
+      .from('pets')
+      .select('id, customer_id')
+      .eq('id', pet_id)
+      .single()
+
+    if (petError || !pet || pet.customer_id !== customer.id) {
+      return NextResponse.json(
+        { error: 'Tier nicht gefunden oder gehört nicht zu diesem Kunden' },
+        { status: 403 }
+      )
+    }
+
+    // Prüfe ob end_date >= start_date
+    if (new Date(end_date) < new Date(start_date)) {
+      return NextResponse.json(
+        { error: 'Enddatum muss nach Startdatum liegen' },
+        { status: 400 }
+      )
+    }
 
     const { data, error } = await supabase
-      .from('pets')
+      .from('bookings')
       .insert({
         customer_id: customer.id,
-        ...petData,
+        pet_id,
+        service_type,
+        start_date,
+        end_date,
+        message: message || null,
+        status: 'pending',
       })
-      .select()
+      .select(`
+        *,
+        pet:pets(id, name, tierart),
+        customer:customers(id, vorname, nachname)
+      `)
       .single()
 
     if (error) {
       throw error
     }
 
-    return NextResponse.json({ pet: data })
+    return NextResponse.json({ booking: data })
   } catch (error: any) {
-    console.error('Error creating pet:', error)
+    console.error('Error creating booking:', error)
     return NextResponse.json(
-      { error: error.message || 'Fehler beim Erstellen des Tieres' },
+      { error: error.message || 'Fehler beim Erstellen der Buchung' },
       { status: 500 }
     )
   }
 }
-
 

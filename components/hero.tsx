@@ -6,7 +6,7 @@ import Link from "next/link"
 export function Hero() {
   return (
     <section className="bg-gradient-to-br from-sage-50 to-sage-100 py-16 lg:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="space-y-8">

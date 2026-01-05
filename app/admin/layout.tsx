@@ -36,7 +36,7 @@ export default function AdminLayout({
     <AuthGuard requiredRole="admin">
       <div className="min-h-screen bg-sage-50">
         <nav className="bg-white border-b border-sage-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex items-center space-x-8">
                 <Link href="/admin/dashboard" className="text-xl font-bold text-sage-900">
@@ -73,6 +73,18 @@ export default function AdminLayout({
                   >
                     Eigenschaften
                   </Link>
+                  <Link
+                    href="/admin/prices"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-sage-700 hover:bg-sage-100"
+                  >
+                    Preise
+                  </Link>
+                  <Link
+                    href="/admin/bookings"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-sage-700 hover:bg-sage-100"
+                  >
+                    Buchungen
+                  </Link>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -90,7 +102,7 @@ export default function AdminLayout({
             </div>
           </div>
         </nav>
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </main>
       </div>

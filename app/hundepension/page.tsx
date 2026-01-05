@@ -109,7 +109,7 @@ export default function HundepensionPage() {
     <main className="pt-16">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-sage-50 to-sage-100 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <Badge className="bg-sage-600 text-white mb-4">Hundepension</Badge>
@@ -159,7 +159,7 @@ export default function HundepensionPage() {
 
       {/* Qualifications Section */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Unsere Qualifikationen
@@ -189,7 +189,7 @@ export default function HundepensionPage() {
 
       {/* Activities Section */}
       <section className="py-16 lg:py-24 bg-sage-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Bei uns darf Dein Hund ein Hund sein
@@ -224,7 +224,7 @@ export default function HundepensionPage() {
 
       {/* Pricing Section */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Unsere Preise
@@ -306,7 +306,7 @@ export default function HundepensionPage() {
 
       {/* Important Information */}
       <section className="py-16 lg:py-24 bg-sage-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Wichtige Hinweise

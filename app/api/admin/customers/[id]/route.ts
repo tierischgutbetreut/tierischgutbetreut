@@ -51,14 +51,14 @@ export async function GET(
     }
 
     // Prüfe ob User eingeloggt ist
-    const { data: { user }, error: authError } = await client.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
     }
 
     // Prüfe Admin-Rechte
-    const { data: userData, error: userError } = await client
+    const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
       .eq('id', user.id)
@@ -71,7 +71,7 @@ export async function GET(
     const customerId = params.id
 
     // Hole Customer mit allen verknüpften Daten
-    const { data: customer, error: customerError } = await client
+    const { data: customer, error: customerError } = await supabase
       .from('customers')
       .select('*, pets(*), documents(*)')
       .eq('id', customerId)
@@ -84,7 +84,28 @@ export async function GET(
       )
     }
 
-    return NextResponse.json({ customer })
+    // Hole Onboarding-Token, falls vorhanden und nicht verwendet
+    let onboardingToken = null
+    if (!customer.onboarding_completed) {
+      const { data: tokenData } = await supabase
+        .from('onboarding_tokens')
+        .select('token, used')
+        .eq('customer_id', customerId)
+        .eq('used', false)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (tokenData) {
+        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+        onboardingToken = {
+          token: tokenData.token,
+          url: `${baseUrl}/onboarding/${tokenData.token}`,
+        }
+      }
+    }
+
+    return NextResponse.json({ customer, onboardingToken })
   } catch (error: any) {
     console.error('Error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
@@ -103,14 +124,14 @@ export async function PUT(
     }
 
     // Prüfe ob User eingeloggt ist
-    const { data: { user }, error: authError } = await client.auth.getUser()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
 
     if (authError || !user) {
       return NextResponse.json({ error: 'Nicht autorisiert' }, { status: 401 })
     }
 
     // Prüfe Admin-Rechte
-    const { data: userData, error: userError } = await client
+    const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role')
       .eq('id', user.id)
@@ -123,7 +144,7 @@ export async function PUT(
     const customerId = params.id
     const updates = await request.json()
 
-    const { data: customer, error: customerError } = await client
+    const { data: customer, error: customerError } = await supabase
       .from('customers')
       .update(updates)
       .eq('id', customerId)

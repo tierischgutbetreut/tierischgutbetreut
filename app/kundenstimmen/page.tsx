@@ -41,7 +41,7 @@ export default function KundenstimmenPage() {
       <div className="min-h-screen bg-white">
         {/* Hero Section */}
         <section className="py-16 lg:py-24 bg-gradient-to-br from-sage-50 to-sage-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="font-raleway text-4xl lg:text-5xl font-bold text-sage-900 mb-6">
               Wir sagen DANKE für Euer Vertrauen
             </h1>
@@ -53,7 +53,7 @@ export default function KundenstimmenPage() {
 
         {/* Loading State */}
         <section className="py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(9)].map((_, index) => (
                 <Card key={index} className="border-sage-200 animate-pulse h-full flex flex-col">
@@ -76,7 +76,7 @@ export default function KundenstimmenPage() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-sage-50 to-sage-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="font-raleway text-4xl lg:text-5xl font-bold text-sage-900 mb-6">
             Wir sagen DANKE für Euer Vertrauen
           </h1>
@@ -98,7 +98,7 @@ export default function KundenstimmenPage() {
 
       {/* Testimonials Grid */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {testimonials.map((testimonial) => (
               <Card key={testimonial.id} className="border-sage-200 hover:shadow-lg transition-shadow duration-300 h-full flex flex-col">

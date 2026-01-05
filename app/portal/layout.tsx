@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { getCurrentUser, signOut } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
+import { NewsBar } from '@/components/news-bar'
 import Link from 'next/link'
 
 export default function PortalLayout({
@@ -35,8 +36,9 @@ export default function PortalLayout({
   return (
     <AuthGuard requiredRole="customer">
       <div className="min-h-screen bg-sage-50">
+        <NewsBar />
         <nav className="bg-white border-b border-sage-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between h-16">
               <div className="flex items-center space-x-8">
                 <Link href="/portal" className="text-xl font-bold text-sage-900">
@@ -67,6 +69,18 @@ export default function PortalLayout({
                   >
                     Dokumente
                   </Link>
+                  <Link
+                    href="/portal/prices"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-sage-700 hover:bg-sage-100"
+                  >
+                    Preise
+                  </Link>
+                  <Link
+                    href="/portal/bookings"
+                    className="px-3 py-2 rounded-md text-sm font-medium text-sage-700 hover:bg-sage-100"
+                  >
+                    Buchungen
+                  </Link>
                 </div>
               </div>
               <div className="flex items-center space-x-4">
@@ -84,7 +98,7 @@ export default function PortalLayout({
             </div>
           </div>
         </nav>
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {children}
         </main>
       </div>

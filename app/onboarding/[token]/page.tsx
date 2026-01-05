@@ -29,16 +29,58 @@ export default function OnboardingPage() {
 
   async function verifyToken() {
     try {
+      console.log('Verifying token:', token)
       const response = await fetch('/api/onboarding/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       })
 
-      const data = await response.json()
+      console.log('Response status:', response.status, response.statusText)
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()))
+
+      let data = {}
+      let responseText = ''
+      
+      try {
+        responseText = await response.text()
+        console.log('Response text:', responseText)
+        
+        if (responseText) {
+          try {
+            data = JSON.parse(responseText)
+            console.log('Parsed data:', data)
+          } catch (parseError) {
+            console.error('JSON parse error:', parseError)
+            console.error('Response text that failed to parse:', responseText)
+            data = { error: 'Ungültige JSON-Antwort vom Server' }
+          }
+        } else {
+          console.error('Empty response body')
+          data = { error: 'Leere Antwort vom Server' }
+        }
+      } catch (readError) {
+        console.error('Error reading response:', readError)
+        data = { error: 'Fehler beim Lesen der Server-Antwort' }
+      }
 
       if (!response.ok) {
-        setError(data.error || 'Ungültiger Token')
+        console.error('Token verification error:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data,
+          responseText: responseText
+        })
+        const errorMessage = data.error || data.message || `Fehler ${response.status}: ${response.statusText || 'Ungültiger Token'}`
+        setError(errorMessage)
+        setLoading(false)
+        return
+      }
+
+      if (!data.lead) {
+        console.error('No lead data in response:', data)
+        setError('Keine Kundendaten gefunden')
+        setLoading(false)
         return
       }
 
@@ -46,7 +88,8 @@ export default function OnboardingPage() {
       setEmail(data.lead.email)
       setStep('register')
     } catch (error: any) {
-      setError('Fehler bei der Token-Validierung')
+      console.error('Error verifying token:', error)
+      setError(error.message || 'Fehler bei der Token-Validierung')
     } finally {
       setLoading(false)
     }
@@ -86,8 +129,8 @@ export default function OnboardingPage() {
         body: JSON.stringify({ token, markAsUsed: true }),
       })
 
-      // Redirect zum Portal
-      router.push('/portal')
+      // Redirect direkt zur Profil-Seite, um das Onboarding fortzusetzen
+      router.push('/portal/profile?onboarding=true')
     } catch (err: any) {
       setError(err.message || 'Ein Fehler ist aufgetreten')
     }
@@ -113,7 +156,7 @@ export default function OnboardingPage() {
           <CardContent>
             <p className="text-center text-sage-600">{error}</p>
             <p className="text-center text-sm text-sage-500 mt-4">
-              Der Onboarding-Link ist ungültig oder abgelaufen. Bitte kontaktieren Sie uns.
+              Bitte kontaktieren Sie uns, wenn das Problem weiterhin besteht.
             </p>
           </CardContent>
         </Card>

@@ -60,7 +60,7 @@ export function NewsBar() {
 
   return (
     <div className="bg-sage-600 text-white py-3 px-4 relative">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-[1440px] mx-auto">
         <div className="flex items-center justify-center text-center">
           <div className="flex items-center space-x-2">
             <Calendar className="h-4 w-4 flex-shrink-0" />

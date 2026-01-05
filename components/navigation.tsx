@@ -16,7 +16,7 @@ export function Navigation() {
 
   return (
     <nav className="bg-white shadow-sm border-b border-sage-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center">
@@ -43,6 +43,9 @@ export function Navigation() {
             </Link>
             <Link href="/kundenstimmen" className="text-sage-700 hover:text-sage-900 font-medium transition-colors">
               Kundenstimmen
+            </Link>
+            <Link href="/portal" className="text-sage-700 hover:text-sage-900 font-medium transition-colors">
+              Kundenportal
             </Link>
             <Link href="/#kontakt">
               <Button className="bg-sage-600 hover:bg-sage-700 text-white">Unverbindlich Anfragen</Button>
@@ -72,6 +75,9 @@ export function Navigation() {
               </Link>
               <Link href="/kundenstimmen" className="text-sage-700 hover:text-sage-900 font-medium">
                 Kundenstimmen
+              </Link>
+              <Link href="/portal" className="text-sage-700 hover:text-sage-900 font-medium">
+                Kundenportal
               </Link>
               <Link href="/#kontakt">
                 <Button className="bg-sage-600 hover:bg-sage-700 text-white w-full">Unverbindlich Anfragen</Button>

@@ -1,16 +1,81 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { supabase } from '@/lib/supabase'
-import { getCurrentUser } from '@/lib/auth'
+import { createClient } from '@supabase/supabase-js'
+
+function getServerClient(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  const projectRef = supabaseUrl.split('//')[1]?.split('.')[0] || 'default'
+  const cookieName = `sb-${projectRef}-auth-token`
+  
+  const authCookie = request.cookies.get(cookieName)?.value
+  let accessToken: string | undefined
+
+  if (authCookie) {
+    try {
+      const sessionData = JSON.parse(decodeURIComponent(authCookie))
+      accessToken = sessionData.access_token
+    } catch (e) {
+      accessToken = authCookie
+    }
+  }
+
+  if (!accessToken) {
+    const authHeader = request.headers.get('authorization')
+    accessToken = authHeader?.replace('Bearer ', '')
+  }
+
+  if (!accessToken) {
+    accessToken = request.cookies.get('sb-access-token')?.value
+  }
+
+  const client = createClient(supabaseUrl, supabaseAnonKey, {
+    global: {
+      headers: accessToken ? {
+        Authorization: `Bearer ${accessToken}`,
+      } : {},
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
+
+  return { client, accessToken }
+}
 
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
+    const { client: supabase, accessToken } = getServerClient(request)
+    
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: 'Nicht autorisiert - Keine Session gefunden' },
+        { status: 401 }
+      )
+    }
+
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !authUser) {
       return NextResponse.json(
         { error: 'Nicht autorisiert' },
+        { status: 401 }
+      )
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .single()
+
+    if (!userData) {
+      return NextResponse.json(
+        { error: 'User-Daten nicht gefunden' },
         { status: 401 }
       )
     }
@@ -22,7 +87,7 @@ export async function PUT(
     const { data: customer } = await supabase
       .from('customers')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userData.id)
       .single()
 
     if (!customer) {
@@ -66,10 +131,33 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
+    const { client: supabase, accessToken } = getServerClient(request)
+    
+    if (!accessToken) {
+      return NextResponse.json(
+        { error: 'Nicht autorisiert - Keine Session gefunden' },
+        { status: 401 }
+      )
+    }
+
+    const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !authUser) {
       return NextResponse.json(
         { error: 'Nicht autorisiert' },
+        { status: 401 }
+      )
+    }
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', authUser.id)
+      .single()
+
+    if (!userData) {
+      return NextResponse.json(
+        { error: 'User-Daten nicht gefunden' },
         { status: 401 }
       )
     }
@@ -80,7 +168,7 @@ export async function DELETE(
     const { data: customer } = await supabase
       .from('customers')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', userData.id)
       .single()
 
     if (!customer) {

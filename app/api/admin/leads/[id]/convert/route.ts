@@ -194,17 +194,16 @@ export async function POST(
 
     // Generiere eindeutigen Token
     const token = randomBytes(32).toString('hex')
-    const expiresAt = new Date()
-    expiresAt.setHours(expiresAt.getHours() + 72) // 72 Stunden Gültigkeit
 
     // Erstelle Onboarding-Token mit customer_id (contact_request_id bleibt null)
+    // Keine zeitliche Gültigkeit - Token läuft nicht ab
     const { data: onboardingToken, error: tokenError } = await supabase
       .from('onboarding_tokens')
       .insert({
         customer_id: customer.id,
         contact_request_id: null, // Explizit null, da wir jetzt customer_id verwenden
         token,
-        expires_at: expiresAt.toISOString(),
+        expires_at: null, // Keine zeitliche Gültigkeit
         used: false,
       })
       .select()
@@ -247,7 +246,6 @@ export async function POST(
             status: customer.status,
           },
           onboarding_url: onboardingUrl,
-          expires_at: expiresAt.toISOString(),
           timestamp: new Date().toISOString(),
         }
 
@@ -278,6 +276,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
+      customer_id: customer.id,
       token: onboardingToken,
       onboarding_url: onboardingUrl,
     })

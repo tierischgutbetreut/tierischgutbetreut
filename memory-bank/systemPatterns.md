@@ -38,7 +38,7 @@ components/
 - Gewichte: 400 (normal), 500 (medium), 700 (bold), 900 (black)
 
 ### Layout-Patterns
-- **Container**: `max-w-7xl mx-auto px-4 sm:px-6 lg:px-8`
+- **Container**: `max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8`
 - **Spacing**: Konsistente `py-16 lg:py-24` für Sektionen
 - **Grid**: Responsive Grids mit `grid md:grid-cols-2 lg:grid-cols-4`
 

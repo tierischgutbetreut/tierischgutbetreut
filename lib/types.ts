@@ -39,6 +39,11 @@ export interface Pet {
   geschlecht: string | null
   letzte_impfung: string | null
   letzte_impfung_zusatz: string | null
+  futtermenge: string | null
+  medikamente: string | null
+  besonderheiten: string | null
+  intervall_impfung: string | null
+  intervall_entwurmung: string | null
   created_at: string
   updated_at: string
 }
@@ -204,4 +209,56 @@ export interface PropertyValue {
   updated_at: string
   // Joined data
   property_definition?: PropertyDefinition
+}
+
+// Booking Types
+export type ServiceType = 'hundepension' | 'katzenbetreuung' | 'tagesbetreuung'
+export type BookingStatus = 'pending' | 'approved' | 'rejected'
+
+export interface BookingRequest {
+  id: string
+  customer_id: string
+  pet_id: string
+  service_type: ServiceType
+  start_date: string
+  end_date: string
+  message: string | null
+  status: BookingStatus
+  admin_notes: string | null
+  responded_at: string | null
+  responded_by: string | null
+  created_at: string
+  updated_at: string
+  // Joined data
+  customer?: Customer
+  pet?: Pet
+  responded_by_user?: User
+}
+
+export interface CapacitySetting {
+  id: string
+  service_type: ServiceType | null // null = Gesamtkapazität
+  default_capacity: number
+  created_at: string
+  updated_at: string
+}
+
+export interface CapacityOverride {
+  id: string
+  date: string
+  service_type: ServiceType | null // null = Gesamtkapazität
+  capacity: number
+  reason: string | null
+  created_at: string
+}
+
+// Calendar view types
+export interface CalendarDay {
+  date: Date
+  bookings: BookingRequest[]
+  capacity: {
+    current: number
+    max: number
+    serviceType?: ServiceType | null
+  }
 }

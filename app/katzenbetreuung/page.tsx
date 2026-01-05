@@ -79,7 +79,7 @@ export default function KatzenbetreuungPage() {
     <main className="pt-16">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-sage-50 to-sage-100 py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <Badge className="bg-sage-600 text-white mb-4">Katzenbetreuung</Badge>
@@ -120,7 +120,7 @@ export default function KatzenbetreuungPage() {
 
       {/* Services Section */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Unsere Katzenbetreuung beinhaltet
@@ -155,7 +155,7 @@ export default function KatzenbetreuungPage() {
 
       {/* Pricing Section */}
       <section className="py-16 lg:py-24 bg-sage-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Preise
@@ -210,7 +210,7 @@ export default function KatzenbetreuungPage() {
 
       {/* Cancellation Policy */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Stornierungsbedingungen
@@ -234,7 +234,7 @@ export default function KatzenbetreuungPage() {
 
       {/* Important Notes */}
       <section className="py-16 lg:py-24 bg-sage-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">
               Wichtige Hinweise

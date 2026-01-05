@@ -159,11 +159,16 @@ export default function LeadDetailPage() {
       if (response.ok) {
         const data = await response.json()
         toast({
-          title: 'Onboarding-Link erstellt',
-          description: `Link: ${data.onboarding_url}`,
+          title: 'Lead erfolgreich konvertiert',
+          description: 'Weiterleitung zur Kundendetailseite...',
         })
-        loadLead()
-        updateLeadStatus('converted')
+        // Weiterleitung zur Kundendetailseite
+        if (data.customer_id) {
+          router.push(`/admin/customers/${data.customer_id}`)
+        } else {
+          // Fallback: Zur Kundenübersicht, wenn keine customer_id vorhanden
+          router.push('/admin/customers')
+        }
       } else {
         const error = await response.json()
         toast({

@@ -160,7 +160,7 @@ export function Contact() {
   if (!mounted) {
     return (
       <section id="kontakt" className="py-16 lg:py-24 bg-sage-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">Kontakt aufnehmen</h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -177,7 +177,7 @@ export function Contact() {
 
   return (
     <section id="kontakt" className="py-16 lg:py-24 bg-sage-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="font-raleway text-3xl lg:text-4xl font-bold text-sage-900 mb-4">Kontakt aufnehmen</h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">

@@ -1,26 +1,35 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Textarea } from '@/components/ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog'
 import { useToast } from '@/hooks/use-toast'
+import { Plus, Trash2 } from 'lucide-react'
 import type { Pet } from '@/lib/types'
 
 export default function PetsPage() {
   const [pets, setPets] = useState<Pet[]>([])
   const [loading, setLoading] = useState(true)
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [editingPet, setEditingPet] = useState<Pet | null>(null)
-  const [formData, setFormData] = useState({
+  const [showPetForm, setShowPetForm] = useState(false)
+  const [editingPetId, setEditingPetId] = useState<string | null>(null)
+  const [uploadingDocuments, setUploadingDocuments] = useState(false)
+  const [impfpassFile, setImpfpassFile] = useState<File | null>(null)
+  const [wurmtestFile, setWurmtestFile] = useState<File | null>(null)
+  const [petFormData, setPetFormData] = useState({
     name: '',
     tierart: '',
     geschlecht: '',
     letzte_impfung: '',
-    letzte_impfung_zusatz: '',
+    futtermenge: '',
+    medikamente: '',
+    besonderheiten: '',
+    intervall_impfung: '',
+    intervall_entwurmung: '',
   })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [petToDelete, setPetToDelete] = useState<Pet | null>(null)
@@ -42,74 +51,137 @@ export default function PetsPage() {
     }
   }
 
-  function openDialog(pet?: Pet) {
+  function openPetForm(pet?: Pet) {
     if (pet) {
-      setEditingPet(pet)
-      setFormData({
+      setEditingPetId(pet.id)
+      setPetFormData({
         name: pet.name,
         tierart: pet.tierart || '',
         geschlecht: pet.geschlecht || '',
         letzte_impfung: pet.letzte_impfung || '',
-        letzte_impfung_zusatz: pet.letzte_impfung_zusatz || '',
+        futtermenge: pet.futtermenge || '',
+        medikamente: pet.medikamente || '',
+        besonderheiten: pet.besonderheiten || '',
+        intervall_impfung: pet.intervall_impfung || '',
+        intervall_entwurmung: pet.intervall_entwurmung || '',
       })
     } else {
-      setEditingPet(null)
-      setFormData({
+      setEditingPetId(null)
+      setPetFormData({
         name: '',
         tierart: '',
         geschlecht: '',
         letzte_impfung: '',
-        letzte_impfung_zusatz: '',
+        futtermenge: '',
+        medikamente: '',
+        besonderheiten: '',
+        intervall_impfung: '',
+        intervall_entwurmung: '',
       })
     }
-    setDialogOpen(true)
+    setImpfpassFile(null)
+    setWurmtestFile(null)
+    setShowPetForm(true)
   }
 
-  async function handleSave() {
+  async function handleSavePet() {
     try {
-      if (editingPet) {
-        // Update
-        const response = await fetch(`/api/portal/pets/${editingPet.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
-        })
+      setUploadingDocuments(true)
+      
+      const url = editingPetId 
+        ? `/api/portal/pets/${editingPetId}`
+        : '/api/portal/pets'
+      const method = editingPetId ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(petFormData),
+      })
 
-        if (response.ok) {
-          loadPets()
-          setDialogOpen(false)
-        } else {
-          const error = await response.json()
-          toast({
-            title: 'Fehler',
-            description: error.error || 'Fehler beim Aktualisieren',
-            variant: 'destructive',
-          })
-        }
-      } else {
-        // Create
-        const response = await fetch('/api/portal/pets', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+      if (!response.ok) {
+        const error = await response.json()
+        toast({
+          title: 'Fehler',
+          description: error.error || 'Fehler beim Speichern',
+          variant: 'destructive',
         })
-
-        if (response.ok) {
-          loadPets()
-          setDialogOpen(false)
-          toast({
-            title: 'Erfolg',
-            description: 'Tier erfolgreich hinzugefügt',
-          })
-        } else {
-          const error = await response.json()
-          toast({
-            title: 'Fehler',
-            description: error.error || 'Fehler beim Erstellen',
-            variant: 'destructive',
-          })
-        }
+        setUploadingDocuments(false)
+        return
       }
+
+      const petData = await response.json()
+      const savedPetId = petData.pet?.id || editingPetId
+
+      // Lade Dokumente hoch, falls vorhanden
+      if (savedPetId) {
+        const uploadPromises = []
+        
+        if (impfpassFile) {
+          const formData = new FormData()
+          formData.append('file', impfpassFile)
+          formData.append('document_type', 'impfpass')
+          formData.append('pet_id', savedPetId)
+          
+          uploadPromises.push(
+            fetch('/api/portal/documents', {
+              method: 'POST',
+              body: formData,
+            }).catch(err => {
+              console.error('Error uploading impfpass:', err)
+              toast({
+                title: 'Warnung',
+                description: 'Impfpass konnte nicht hochgeladen werden',
+                variant: 'destructive',
+              })
+            })
+          )
+        }
+
+        if (wurmtestFile) {
+          const formData = new FormData()
+          formData.append('file', wurmtestFile)
+          formData.append('document_type', 'wurmtest')
+          formData.append('pet_id', savedPetId)
+          
+          uploadPromises.push(
+            fetch('/api/portal/documents', {
+              method: 'POST',
+              body: formData,
+            }).catch(err => {
+              console.error('Error uploading wurmtest:', err)
+              toast({
+                title: 'Warnung',
+                description: 'Wurmtest konnte nicht hochgeladen werden',
+                variant: 'destructive',
+              })
+            })
+          )
+        }
+
+        await Promise.all(uploadPromises)
+      }
+
+      await loadPets()
+      setPetFormData({
+        name: '',
+        tierart: '',
+        geschlecht: '',
+        letzte_impfung: '',
+        futtermenge: '',
+        medikamente: '',
+        besonderheiten: '',
+        intervall_impfung: '',
+        intervall_entwurmung: '',
+      })
+      setImpfpassFile(null)
+      setWurmtestFile(null)
+      setShowPetForm(false)
+      setEditingPetId(null)
+      toast({
+        title: 'Erfolg',
+        description: editingPetId ? 'Tier erfolgreich aktualisiert' : 'Tier erfolgreich hinzugefügt',
+      })
     } catch (error) {
       console.error('Error saving pet:', error)
       toast({
@@ -117,6 +189,8 @@ export default function PetsPage() {
         description: 'Fehler beim Speichern',
         variant: 'destructive',
       })
+    } finally {
+      setUploadingDocuments(false)
     }
   }
 
@@ -129,12 +203,12 @@ export default function PetsPage() {
     if (!petToDelete) return
 
     try {
-      const response = await fetch(`/api/portal/pets/${petId}`, {
+      const response = await fetch(`/api/portal/pets/${petToDelete.id}`, {
         method: 'DELETE',
       })
 
       if (response.ok) {
-        loadPets()
+        await loadPets()
         setDeleteDialogOpen(false)
         setPetToDelete(null)
         toast({
@@ -169,121 +243,325 @@ export default function PetsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-sage-900">Meine Tiere</h1>
-          <p className="mt-2 text-sage-600">Verwalten Sie Ihre Tiere</p>
-        </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={() => openDialog()} className="bg-sage-600 hover:bg-sage-700">
-              Neues Tier hinzufügen
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {editingPet ? 'Tier bearbeiten' : 'Neues Tier hinzufügen'}
-              </DialogTitle>
-              <DialogDescription>
-                Geben Sie die Informationen zu Ihrem Tier ein
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="name">Name *</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
-              <div>
-                <Label htmlFor="tierart">Tierart</Label>
-                <Input
-                  id="tierart"
-                  value={formData.tierart}
-                  onChange={(e) => setFormData({ ...formData, tierart: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="geschlecht">Geschlecht</Label>
-                <Input
-                  id="geschlecht"
-                  value={formData.geschlecht}
-                  onChange={(e) => setFormData({ ...formData, geschlecht: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="letzte_impfung">Letzte Impfung</Label>
-                <Input
-                  id="letzte_impfung"
-                  type="date"
-                  value={formData.letzte_impfung}
-                  onChange={(e) => setFormData({ ...formData, letzte_impfung: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="letzte_impfung_zusatz">Letzte Impfung (Zusatz)</Label>
-                <Input
-                  id="letzte_impfung_zusatz"
-                  type="date"
-                  value={formData.letzte_impfung_zusatz}
-                  onChange={(e) => setFormData({ ...formData, letzte_impfung_zusatz: e.target.value })}
-                />
-              </div>
-              <Button onClick={handleSave} className="w-full bg-sage-600 hover:bg-sage-700">
-                Speichern
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+      <div>
+        <h1 className="text-3xl font-bold text-sage-900">Meine Tiere</h1>
+        <p className="mt-2 text-sage-600">Verwalte deine Tiere</p>
       </div>
 
-      {pets.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <p className="text-sage-600">Noch keine Tiere hinzugefügt</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {pets.map((pet) => (
-            <Card key={pet.id}>
-              <CardHeader>
-                <CardTitle>{pet.name}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {pet.tierart && <p className="text-sm text-sage-600">Tierart: {pet.tierart}</p>}
-                {pet.geschlecht && <p className="text-sm text-sage-600">Geschlecht: {pet.geschlecht}</p>}
-                {pet.letzte_impfung && (
-                  <p className="text-sm text-sage-600">
-                    Letzte Impfung: {new Date(pet.letzte_impfung).toLocaleDateString('de-DE')}
-                  </p>
-                )}
-                <div className="flex gap-2 mt-4">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openDialog(pet)}
-                  >
-                    Bearbeiten
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openDeleteDialog(pet)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    Löschen
-                  </Button>
+      {/* Tier/e anlegen */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div>
+              <CardTitle>Deine Tier/e</CardTitle>
+              <CardDescription className="mt-1">
+                Lege deine Tier/e an und ergänze die Tierinformationen. Für jedes Tier kannst du spezifische Informationen wie Futtermenge, Medikamente und Besonderheiten hinterlegen.
+              </CardDescription>
+            </div>
+            <Button
+              onClick={() => openPetForm()}
+              className="bg-sage-600 hover:bg-sage-700"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Tier hinzufügen
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {showPetForm && (
+            <div className="p-4 border border-sage-200 rounded-lg bg-sage-50 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="pet-name">Name *</Label>
+                  <Input
+                    id="pet-name"
+                    value={petFormData.name}
+                    onChange={(e) => setPetFormData({ ...petFormData, name: e.target.value })}
+                    placeholder="Name des Tieres"
+                    required
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                <div>
+                  <Label htmlFor="pet-tierart">Tierart</Label>
+                  <Select
+                    value={petFormData.tierart || ''}
+                    onValueChange={(value) => setPetFormData({ ...petFormData, tierart: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Tierart wählen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Hund">Hund</SelectItem>
+                      <SelectItem value="Katze">Katze</SelectItem>
+                      <SelectItem value="Andere">Andere</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="pet-geschlecht">Geschlecht</Label>
+                  <Select
+                    value={petFormData.geschlecht || ''}
+                    onValueChange={(value) => setPetFormData({ ...petFormData, geschlecht: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Geschlecht wählen" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="hündin">Hündin</SelectItem>
+                      <SelectItem value="rüde">Rüde</SelectItem>
+                      <SelectItem value="rüde_kastriert">Rüde - kastiert</SelectItem>
+                      <SelectItem value="rüde_kastriert_gechipt">Rüde - kastiert - gechipt</SelectItem>
+                      <SelectItem value="hündin_kastriert">Hündin - kastriert</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="pet-impfung">Letzte Impfung</Label>
+                  <Input
+                    id="pet-impfung"
+                    type="date"
+                    value={petFormData.letzte_impfung || ''}
+                    onChange={(e) => setPetFormData({ ...petFormData, letzte_impfung: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              {/* Tier-Informationen */}
+              <div className="border-t pt-4 space-y-4">
+                <h3 className="font-semibold text-sage-900">Tier-Informationen</h3>
+                <div>
+                  <Label htmlFor="pet-futtermenge">Futtermenge</Label>
+                  <Textarea
+                    id="pet-futtermenge"
+                    value={petFormData.futtermenge || ''}
+                    onChange={(e) => setPetFormData({ ...petFormData, futtermenge: e.target.value })}
+                    rows={3}
+                    placeholder="z.B. 200g Trockenfutter morgens, 150g abends"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pet-medikamente">Medikamente</Label>
+                  <Textarea
+                    id="pet-medikamente"
+                    value={petFormData.medikamente || ''}
+                    onChange={(e) => setPetFormData({ ...petFormData, medikamente: e.target.value })}
+                    rows={3}
+                    placeholder="z.B. Tabletten gegen Arthrose, täglich morgens"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="pet-besonderheiten">Besonderheiten</Label>
+                  <Textarea
+                    id="pet-besonderheiten"
+                    value={petFormData.besonderheiten || ''}
+                    onChange={(e) => setPetFormData({ ...petFormData, besonderheiten: e.target.value })}
+                    rows={3}
+                    placeholder="z.B. Allergien, Verhaltensbesonderheiten, etc."
+                  />
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-3">Intervalle</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="pet-intervall-impfung">Intervall Impfung</Label>
+                      <Select
+                        value={petFormData.intervall_impfung || ''}
+                        onValueChange={(value) => setPetFormData({ ...petFormData, intervall_impfung: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Intervall wählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monatlich">Monatlich</SelectItem>
+                          <SelectItem value="vierteljährlich">Vierteljährlich</SelectItem>
+                          <SelectItem value="halbjährlich">Halbjährlich</SelectItem>
+                          <SelectItem value="jährlich">Jährlich</SelectItem>
+                          <SelectItem value="alle_2_jahre">Alle 2 Jahre</SelectItem>
+                          <SelectItem value="alle_3_jahre">Alle 3 Jahre</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="pet-intervall-entwurmung">Intervall Entwurmung/Testung</Label>
+                      <Select
+                        value={petFormData.intervall_entwurmung || ''}
+                        onValueChange={(value) => setPetFormData({ ...petFormData, intervall_entwurmung: value })}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Intervall wählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="monatlich">Monatlich</SelectItem>
+                          <SelectItem value="vierteljährlich">Vierteljährlich</SelectItem>
+                          <SelectItem value="halbjährlich">Halbjährlich</SelectItem>
+                          <SelectItem value="jährlich">Jährlich</SelectItem>
+                          <SelectItem value="alle_2_jahre">Alle 2 Jahre</SelectItem>
+                          <SelectItem value="alle_3_jahre">Alle 3 Jahre</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dokumente-Upload */}
+              <div className="border-t pt-4 space-y-4">
+                <h3 className="font-semibold text-sage-900">Dokumente</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="pet-impfpass">Impfpass (Bild)</Label>
+                    <Input
+                      id="pet-impfpass"
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        setImpfpassFile(file || null)
+                      }}
+                    />
+                    {impfpassFile && (
+                      <p className="text-sm text-sage-600 mt-1">
+                        Ausgewählt: {impfpassFile.name}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="pet-wurmtest">Wurmtest (Bild)</Label>
+                    <Input
+                      id="pet-wurmtest"
+                      type="file"
+                      accept="image/*,.pdf"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        setWurmtestFile(file || null)
+                      }}
+                    />
+                    {wurmtestFile && (
+                      <p className="text-sm text-sage-600 mt-1">
+                        Ausgewählt: {wurmtestFile.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleSavePet}
+                  disabled={!petFormData.name || uploadingDocuments}
+                  className="bg-sage-600 hover:bg-sage-700"
+                >
+                  {uploadingDocuments 
+                    ? 'Wird gespeichert...' 
+                    : editingPetId 
+                    ? 'Tier aktualisieren' 
+                    : 'Tier speichern'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowPetForm(false)
+                    setEditingPetId(null)
+                    setPetFormData({
+                      name: '',
+                      tierart: '',
+                      geschlecht: '',
+                      letzte_impfung: '',
+                      futtermenge: '',
+                      medikamente: '',
+                      besonderheiten: '',
+                      intervall_impfung: '',
+                      intervall_entwurmung: '',
+                    })
+                    setImpfpassFile(null)
+                    setWurmtestFile(null)
+                  }}
+                >
+                  Abbrechen
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {pets.length === 0 ? (
+            <p className="text-sage-600 text-center py-8">
+              Noch keine Tier/e angelegt. Bitte füge mindestens ein Tier hinzu.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {pets.map((pet) => (
+                <div key={pet.id} className="p-4 border border-sage-200 rounded-lg">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="font-semibold text-lg">{pet.name}</p>
+                      <p className="text-sm text-sage-600">
+                        {pet.tierart && `${pet.tierart} • `}
+                        {pet.geschlecht && pet.geschlecht}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openPetForm(pet)}
+                        className="border-sage-300 text-sage-700 hover:bg-sage-50"
+                      >
+                        Bearbeiten
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => openDeleteDialog(pet)}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {(pet.futtermenge || pet.medikamente || pet.besonderheiten || pet.intervall_impfung || pet.intervall_entwurmung) && (
+                    <div className="border-t pt-3 mt-3 space-y-2 text-sm">
+                      {pet.futtermenge && (
+                        <div>
+                          <p className="text-xs font-semibold text-sage-600">Futtermenge:</p>
+                          <p className="text-sm text-sage-700">{pet.futtermenge}</p>
+                        </div>
+                      )}
+                      {pet.medikamente && (
+                        <div>
+                          <p className="text-xs font-semibold text-sage-600">Medikamente:</p>
+                          <p className="text-sm text-sage-700">{pet.medikamente}</p>
+                        </div>
+                      )}
+                      {pet.besonderheiten && (
+                        <div>
+                          <p className="text-xs font-semibold text-sage-600">Besonderheiten:</p>
+                          <p className="text-sm text-sage-700">{pet.besonderheiten}</p>
+                        </div>
+                      )}
+                      {(pet.intervall_impfung || pet.intervall_entwurmung) && (
+                        <div className="grid grid-cols-2 gap-2">
+                          {pet.intervall_impfung && (
+                            <div>
+                              <p className="text-xs font-semibold text-sage-600">Impfung:</p>
+                              <p className="text-sm text-sage-700">{pet.intervall_impfung}</p>
+                            </div>
+                          )}
+                          {pet.intervall_entwurmung && (
+                            <div>
+                              <p className="text-xs font-semibold text-sage-600">Entwurmung:</p>
+                              <p className="text-sm text-sage-700">{pet.intervall_entwurmung}</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -291,7 +569,7 @@ export default function PetsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Tier löschen?</AlertDialogTitle>
             <AlertDialogDescription>
-              Möchten Sie "{petToDelete?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+              Möchtest du "{petToDelete?.name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -308,6 +586,3 @@ export default function PetsPage() {
     </div>
   )
 }
-
-
-

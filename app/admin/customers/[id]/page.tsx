@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
-import type { Customer, Pet, Document } from '@/lib/types'
+import type { Customer, Pet, Document, BookingRequest } from '@/lib/types'
 import { PropertyEditor } from '@/components/admin/property-editor'
 import { useToast } from '@/hooks/use-toast'
 
@@ -33,11 +33,14 @@ export default function CustomerDetailPage() {
   const [loading, setLoading] = useState(true)
   const [notes, setNotes] = useState<Note[]>([])
   const [newNote, setNewNote] = useState('')
+  const [onboardingToken, setOnboardingToken] = useState<{ token: string; url: string } | null>(null)
+  const [bookings, setBookings] = useState<BookingRequest[]>([])
 
   useEffect(() => {
     if (customerId) {
       loadCustomer()
       loadNotes()
+      loadBookings()
     }
   }, [customerId])
 
@@ -46,15 +49,42 @@ export default function CustomerDetailPage() {
       const response = await fetch(`/api/admin/customers/${customerId}`, {
         credentials: 'include',
       })
+      
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error('Error loading customer:', response.status, errorData)
+        toast({
+          title: 'Fehler beim Laden',
+          description: errorData.error || 'Kunde konnte nicht geladen werden',
+          variant: 'destructive',
+        })
+        router.push('/admin/customers')
+        return
+      }
+      
       const data = await response.json()
 
       if (data.customer) {
         setCustomer(data.customer)
+        if (data.onboardingToken) {
+          setOnboardingToken(data.onboardingToken)
+        }
       } else {
+        toast({
+          title: 'Kunde nicht gefunden',
+          description: 'Der angeforderte Kunde existiert nicht',
+          variant: 'destructive',
+        })
         router.push('/admin/customers')
       }
     } catch (error) {
       console.error('Error loading customer:', error)
+      toast({
+        title: 'Fehler',
+        description: 'Ein unerwarteter Fehler ist aufgetreten',
+        variant: 'destructive',
+      })
+      router.push('/admin/customers')
     } finally {
       setLoading(false)
     }
@@ -72,6 +102,21 @@ export default function CustomerDetailPage() {
       }
     } catch (error) {
       console.error('Error loading notes:', error)
+    }
+  }
+
+  async function loadBookings() {
+    try {
+      const response = await fetch(`/api/admin/bookings?customer_id=${customerId}`, {
+        credentials: 'include',
+      })
+      const data = await response.json()
+
+      if (data.bookings) {
+        setBookings(data.bookings)
+      }
+    } catch (error) {
+      console.error('Error loading bookings:', error)
     }
   }
 
@@ -260,6 +305,31 @@ export default function CustomerDetailPage() {
                   </Badge>
                 </div>
               </div>
+              {!customer.onboarding_completed && onboardingToken && (
+                <div className="mt-4 p-4 bg-sage-50 rounded-lg border border-sage-200">
+                  <p className="text-sm font-semibold text-sage-900 mb-2">Onboarding-Link</p>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={onboardingToken.url}
+                      className="flex-1 px-3 py-2 text-sm border border-sage-300 rounded-md bg-white"
+                    />
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        navigator.clipboard.writeText(onboardingToken.url)
+                        toast({
+                          title: 'Kopiert',
+                          description: 'Onboarding-Link wurde in die Zwischenablage kopiert',
+                        })
+                      }}
+                    >
+                      Kopieren
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="border-t pt-4 text-xs text-sage-500">
@@ -372,6 +442,78 @@ export default function CustomerDetailPage() {
                 </div>
               ) : (
                 <p className="text-sage-600 text-center py-4">Keine Dokumente hochgeladen</p>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Buchungen */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Buchungen ({bookings.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {bookings.length > 0 ? (
+                <div className="space-y-3">
+                  {bookings
+                    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                    .map((booking) => {
+                      const isPast = new Date(booking.end_date) < new Date()
+                      const isCurrent = new Date(booking.start_date) <= new Date() && new Date(booking.end_date) >= new Date()
+                      const isFuture = new Date(booking.start_date) > new Date()
+
+                      let statusBadge = ''
+                      if (booking.status === 'approved') {
+                        statusBadge = 'bg-green-100 text-green-800 border-green-300'
+                      } else if (booking.status === 'rejected') {
+                        statusBadge = 'bg-red-100 text-red-800 border-red-300'
+                      } else {
+                        statusBadge = 'bg-yellow-100 text-yellow-800 border-yellow-300'
+                      }
+
+                      return (
+                        <div
+                          key={booking.id}
+                          className={`p-3 border border-sage-200 rounded-lg ${isPast ? 'opacity-75' : ''}`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <p className="font-semibold text-sage-900">
+                                  {booking.pet?.name || 'Unbekannt'}
+                                </p>
+                                <Badge variant="outline" className="text-xs">
+                                  {booking.service_type === 'hundepension' ? 'Hundepension' :
+                                   booking.service_type === 'katzenbetreuung' ? 'Katzenbetreuung' :
+                                   booking.service_type === 'tagesbetreuung' ? 'Tagesbetreuung' :
+                                   booking.service_type}
+                                </Badge>
+                                {(isPast || isCurrent || isFuture) && (
+                                  <Badge variant="outline" className="text-xs">
+                                    {isPast ? 'Vergangen' : isCurrent ? 'Aktuell' : 'Zukünftig'}
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-sage-600">
+                                {new Date(booking.start_date).toLocaleDateString('de-DE')} - {new Date(booking.end_date).toLocaleDateString('de-DE')}
+                              </p>
+                              {booking.message && (
+                                <p className="text-sm text-sage-500 mt-1 line-clamp-1">
+                                  {booking.message}
+                                </p>
+                              )}
+                            </div>
+                            <Badge className={statusBadge}>
+                              {booking.status === 'approved' ? 'Genehmigt' :
+                               booking.status === 'rejected' ? 'Abgelehnt' :
+                               'Ausstehend'}
+                            </Badge>
+                          </div>
+                        </div>
+                      )
+                    })}
+                </div>
+              ) : (
+                <p className="text-sage-600 text-center py-4">Keine Buchungen vorhanden</p>
               )}
             </CardContent>
           </Card>

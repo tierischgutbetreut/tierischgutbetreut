@@ -54,7 +54,7 @@ export default function DocumentsPage() {
     if (!fileInputRef.current?.files?.[0] || !uploadForm.document_type) {
       toast({
         title: 'Fehler',
-        description: 'Bitte wählen Sie eine Datei und einen Dokumenttyp aus',
+        description: 'Bitte wähle eine Datei und einen Dokumenttyp aus',
         variant: 'destructive',
       })
       return
@@ -168,7 +168,7 @@ export default function DocumentsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-sage-900">Dokumente</h1>
-        <p className="mt-2 text-sage-600">Verwalten Sie Ihre Dokumente</p>
+        <p className="mt-2 text-sage-600">Verwalte deine Dokumente</p>
       </div>
 
       {/* Upload */}
@@ -285,7 +285,7 @@ export default function DocumentsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>Dokument löschen?</AlertDialogTitle>
             <AlertDialogDescription>
-              Möchten Sie "{documentToDelete?.file_name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+              Möchtest du "{documentToDelete?.file_name}" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

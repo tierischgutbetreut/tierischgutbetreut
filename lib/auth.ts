@@ -64,6 +64,8 @@ export async function signIn(email: string, password: string) {
 
 /**
  * Registrierung (für Onboarding)
+ * Der Eintrag in public.users wird automatisch durch den Trigger 
+ * on_auth_user_created erstellt.
  */
 export async function signUp(email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({
@@ -73,22 +75,6 @@ export async function signUp(email: string, password: string) {
 
   if (error) {
     throw error
-  }
-
-  // Erstelle Eintrag in public.users
-  if (data.user) {
-    const { error: userError } = await supabase
-      .from('users')
-      .insert({
-        id: data.user.id,
-        email: data.user.email!,
-        role: 'customer',
-      })
-
-    if (userError) {
-      console.error('Error creating user record:', userError)
-      throw userError
-    }
   }
 
   return data
