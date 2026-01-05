@@ -20,7 +20,12 @@ export const metadata: Metadata = {
   description:
     "Professionelle Tierbetreuung für Hunde und Katzen in Moos. Hundepension, mobile Katzenbetreuung und Tagesbetreuung mit Herz und Erfahrung.",
   keywords: "Tierbetreuung Moos, Hundepension, Katzenbetreuung, Tiersitter, Hundesitter",
-    generator: 'v0.dev'
+  generator: 'v0.dev',
+  icons: {
+    icon: '/images/tigube_logo_hund.jpg',
+    shortcut: '/images/tigube_logo_hund.jpg',
+    apple: '/images/tigube_logo_hund.jpg',
+  },
 }
 
 export default function RootLayout({
