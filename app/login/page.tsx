@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getCurrentUser } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
+import { ArrowLeft } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -92,13 +93,21 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-sage-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-center">Anmelden</CardTitle>
-          <CardDescription className="text-center">
-            Melden Sie sich mit Ihren Zugangsdaten an
-          </CardDescription>
-        </CardHeader>
+      <div className="w-full max-w-md">
+        <Link 
+          href="/" 
+          className="inline-flex items-center text-sage-600 hover:text-sage-700 mb-6 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Zurück zur Startseite
+        </Link>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">Anmelden</CardTitle>
+            <CardDescription className="text-center">
+              Melden Sie sich mit Ihren Zugangsdaten an
+            </CardDescription>
+          </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
@@ -148,7 +157,8 @@ export default function LoginPage() {
             </div>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }
