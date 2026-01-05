@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Phone, Mail, MapPin, Building2, Users, FileText, Shield } from "lucide-react"
+import Link from "next/link"
 
 export default function ImpressumPage() {
   return (
@@ -193,10 +194,13 @@ export default function ImpressumPage() {
                 
                 <div className="pt-4 border-t">
                   <div className="flex flex-wrap gap-4 text-sm">
-                    <a href="#" className="text-sage-600 hover:text-sage-700 flex items-center gap-1">
+                    <Link href="/datenschutz" className="text-sage-600 hover:text-sage-700 flex items-center gap-1">
                       <FileText className="h-3 w-3" />
-                      Datenschutz & AGBs
-                    </a>
+                      Datenschutz
+                    </Link>
+                    <Link href="/" className="text-sage-600 hover:text-sage-700">
+                      Zurück zur Startseite
+                    </Link>
                   </div>
                 </div>
               </CardContent>

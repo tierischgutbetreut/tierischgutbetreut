@@ -278,7 +278,6 @@ export default function HundepensionPage() {
           <div className="bg-sage-100 p-6 rounded-lg mb-12">
             <h4 className="font-semibold text-sage-900 mb-4">Rabatte & Sonderkonditionen</h4>
             <ul className="space-y-2 text-gray-700">
-              <li>• Jeder weitere Hund aus dem selben Haushalt bekommt einen Rabatt i.H.v. 20% je angefangenem Tag (Sonn- und Feiertagspauschale ausgenommen)</li>
               <li>• Langzeit-Betreuung ab einem Zeitraum von 4 Wochen auf Anfrage</li>
             </ul>
           </div>

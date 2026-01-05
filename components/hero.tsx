@@ -53,7 +53,7 @@ export function Hero() {
               <div className="absolute top-4 right-4 bg-white rounded-full px-3 py-2 shadow-lg">
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="text-sm font-semibold text-gray-900">4.9/5</span>
+                  <span className="text-sm font-semibold text-gray-900">5/5</span>
                 </div>
               </div>
             </div>
@@ -81,7 +81,7 @@ export function Hero() {
               </div>
               <div className="flex items-center gap-2">
                 <Star className="h-5 w-5 text-sage-600 fill-current" />
-                <span>4.9/5 Sterne Bewertung</span>
+                <span>5/5 Sterne Bewertung</span>
               </div>
             </div>
           </div>
