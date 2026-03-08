@@ -6,7 +6,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  trailingSlash: false,
   images: {
     unoptimized: true,
     remotePatterns: [
@@ -22,62 +21,62 @@ const nextConfig = {
       {
         source: '/Start',
         destination: '/',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Start/',
         destination: '/',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Hundepension',
         destination: '/hundepension',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Hundepension/',
         destination: '/hundepension',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Unsere-Leistungen',
         destination: '/#leistungen',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Unsere-Leistungen/',
         destination: '/#leistungen',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Kundenstimmen',
         destination: '/kundenstimmen',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Kundenstimmen/',
         destination: '/kundenstimmen',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/SeminareWorkshops',
         destination: '/',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/SeminareWorkshops/',
         destination: '/',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Katzenbetreuung',
         destination: '/katzenbetreuung',
-        permanent: true,
+        permanent: false,
       },
       {
         source: '/Katzenbetreuung/',
         destination: '/katzenbetreuung',
-        permanent: true,
+        permanent: false,
       },
     ]
   },
