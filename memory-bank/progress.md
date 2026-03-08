@@ -32,9 +32,11 @@
 - **Radix UI** - Accessible Komponenten integriert
 - **Theme System** - Dark/Light Mode Support
 - **Image Optimization** - Next.js Image-Komponente genutzt
-- **Webhook-Integration** - API-Route für Kontaktformular mit Webhook-Support
-- **Supabase-Datenbank** - Tabelle `contact_requests` mit RLS-Policies
-- **Form-Validierung** - Client- und Server-Side Validierung implementiert
+- **Webhook-Integration** - Vollständige Backend-Integration für Formular-Übermittlung an externen Webhook
+- **Datenbank-Tabelle** - Supabase-Tabelle `contact_requests` erstellt mit allen Feldern und RLS-Policies
+- **Validierung** - Umfassende Client- und Server-Side Validierung für alle Felder
+- **UI-Verbesserungen** - Klickbares Kalender-Icon rechts im Date-Input-Feld, native Browser-Datepicker ohne Ausrichtungsprobleme
+- **Vercel Routing Fix** - `next.config.mjs` und `vercel.json` konfiguriert für korrekten Zugriff auf Unterseiten; `package-lock.json` entfernt.
 
 ## Was noch zu tun ist 🔄
 
@@ -76,7 +78,8 @@
 ## Bekannte Probleme 🐛
 
 ### Technische Issues
-- **package-lock.json** - Untracked file im Git
+- **package-lock.json** - Gelöscht, um Konflikte mit pnpm zu vermeiden ✅
+- **Vercel Routing** - Fix für Unterseiten-Zugriff implementiert ✅
 - **Placeholder-Bilder** - Benötigen echte Bilder
 - **Webhook-Konfiguration** - CONTACT_WEBHOOK_URL muss in .env.local gesetzt werden
 

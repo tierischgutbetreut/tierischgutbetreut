@@ -16,65 +16,36 @@ const nextConfig = {
       },
     ],
   },
+  trailingSlash: false,
   async redirects() {
     return [
       {
-        source: '/Start',
+        source: '/Start/:path*',
         destination: '/',
         permanent: true,
       },
       {
-        source: '/Start/',
-        destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/Hundepension',
+        source: '/Hundepension/:path*',
         destination: '/hundepension',
         permanent: true,
       },
       {
-        source: '/Hundepension/',
-        destination: '/hundepension',
-        permanent: true,
-      },
-      {
-        source: '/Unsere-Leistungen',
+        source: '/Unsere-Leistungen/:path*',
         destination: '/#leistungen',
         permanent: true,
       },
       {
-        source: '/Unsere-Leistungen/',
-        destination: '/#leistungen',
-        permanent: true,
-      },
-      {
-        source: '/Kundenstimmen',
+        source: '/Kundenstimmen/:path*',
         destination: '/kundenstimmen',
         permanent: true,
       },
       {
-        source: '/Kundenstimmen/',
-        destination: '/kundenstimmen',
-        permanent: true,
-      },
-      {
-        source: '/SeminareWorkshops',
+        source: '/SeminareWorkshops/:path*',
         destination: '/',
         permanent: true,
       },
       {
-        source: '/SeminareWorkshops/',
-        destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/Katzenbetreuung',
-        destination: '/katzenbetreuung',
-        permanent: true,
-      },
-      {
-        source: '/Katzenbetreuung/',
+        source: '/Katzenbetreuung/:path*',
         destination: '/katzenbetreuung',
         permanent: true,
       },
