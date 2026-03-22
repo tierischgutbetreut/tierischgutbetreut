@@ -14,6 +14,7 @@ Das Projekt ist eine **funktionsfähige Homepage** für "Tierisch Gut Betreut" -
 - **Datenbank-Tabelle** - Supabase-Tabelle `contact_requests` erstellt mit allen Feldern und RLS-Policies
 - **Validierung** - Umfassende Client- und Server-Side Validierung für alle Felder
 - **UI-Verbesserungen** - Klickbares Kalender-Icon rechts im Date-Input-Feld, native Browser-Datepicker ohne Ausrichtungsprobleme
+- **Kundenstimmen Sterneanpassung** - Durchschnittsbewertung auf 5.0 Sterne gesetzt in `components/testimonials.tsx` und `app/kundenstimmen/page.tsx`.
 
 ## Aktuelle Arbeitsaufgaben
 

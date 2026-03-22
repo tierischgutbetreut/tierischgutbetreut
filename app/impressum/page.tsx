@@ -47,34 +47,34 @@ export default function ImpressumPage() {
                     <Input id="email" type="email" placeholder="ihre@email.de" required />
                   </div>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon *</Label>
                   <Input id="phone" type="tel" placeholder="Ihre Telefonnummer" required />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="message">Nachricht *</Label>
-                  <Textarea 
-                    id="message" 
+                  <Textarea
+                    id="message"
                     placeholder="Beschreiben Sie Ihren Betreuungsbedarf oder stellen Sie Ihre Frage..."
                     className="min-h-[120px]"
-                    required 
+                    required
                   />
                 </div>
-                
+
                 <div className="flex items-start space-x-2">
                   <Checkbox id="privacy" required />
                   <Label htmlFor="privacy" className="text-sm text-gray-600 leading-relaxed">
-                    Ich erkläre mich mit der Verarbeitung der eingegebenen Daten sowie der 
+                    Ich erkläre mich mit der Verarbeitung der eingegebenen Daten sowie der
                     Datenschutzerklärung einverstanden. *
                   </Label>
                 </div>
-                
+
                 <Button className="w-full bg-sage-600 hover:bg-sage-700 text-white">
                   Nachricht senden
                 </Button>
-                
+
                 <p className="text-sm text-gray-500 text-center">
                   * Pflichtfelder müssen ausgefüllt werden
                 </p>
@@ -99,7 +99,7 @@ export default function ImpressumPage() {
                     <strong>tierisch gut betreut Gesellschaft mit beschränkter Haftung</strong>
                   </p>
                 </div>
-                
+
                 <div>
                   <h3 className="font-semibold text-sage-800 mb-2 flex items-center gap-2">
                     <Users className="h-4 w-4" />
@@ -109,7 +109,7 @@ export default function ImpressumPage() {
                     Tamara Pfaff & Gabriel Haaga
                   </p>
                 </div>
-                
+
                 <div>
                   <h3 className="font-semibold text-sage-800 mb-2 flex items-center gap-2">
                     <MapPin className="h-4 w-4" />
@@ -157,7 +157,7 @@ export default function ImpressumPage() {
                       07732-988 50 91
                     </a>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-sage-600" />
                     <span className="font-medium">Mobil (T. Pfaff):</span>
@@ -165,7 +165,7 @@ export default function ImpressumPage() {
                       0176-724 045 61
                     </a>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-sage-600" />
                     <span className="font-medium">Mobil (G. Haaga):</span>
@@ -173,7 +173,7 @@ export default function ImpressumPage() {
                       0175-468 59 77
                     </a>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-sage-600" />
                     <span className="font-medium">E-Mail:</span>
@@ -195,20 +195,34 @@ export default function ImpressumPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
+                  <h3 className="font-semibold text-sage-800 mb-2">Aufsichtsbehörden</h3>
+                  <div className="text-gray-700 text-sm space-y-2">
+                    <p>
+                      <strong>Veterinäramt Konstanz:</strong><br />
+                      Otto-Blesch-Str. 51, 78315 Radolfzell am Bodensee
+                    </p>
+                    <p>
+                      <strong>Städtisches Finanzamt:</strong><br />
+                      Alpenstraße 9, 78224 Singen a.Htwl.
+                    </p>
+                  </div>
+                </div>
+
+                <div>
                   <h3 className="font-semibold text-sage-800 mb-2">Bildquellen</h3>
                   <div className="text-gray-700 text-sm space-y-1">
                     <p>Bildquelle Pixabay: StockSnap, PicsbyFran, pikabum</p>
                     <p>Foto von Helena Lopes: <a href="https://www.pexels.com/de-de/foto/kurzbeschichteter-tan-dog-2253275/" className="text-sage-600 hover:text-sage-700 underline" target="_blank" rel="noopener noreferrer">https://www.pexels.com/de-de/foto/kurzbeschichteter-tan-dog-2253275/</a></p>
                   </div>
                 </div>
-                
+
                 <div>
                   <h3 className="font-semibold text-sage-800 mb-2">Copyright</h3>
                   <p className="text-gray-700 text-sm">
                     © tierisch gut betreut 2025
                   </p>
                 </div>
-                
+
                 <div className="pt-4 border-t">
                   <div className="flex flex-wrap gap-4 text-sm">
                     <Link href="/datenschutz" className="text-sage-600 hover:text-sage-700 flex items-center gap-1">
@@ -227,4 +241,4 @@ export default function ImpressumPage() {
       </div>
     </div>
   )
-} 
+}

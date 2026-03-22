@@ -81,7 +81,7 @@ export default function KundenstimmenPage() {
             Wir sagen DANKE für Euer Vertrauen
           </h1>
           <p className="text-xl text-sage-700 max-w-3xl mx-auto mb-8">
-            Über 400 zufriedene Tierbesitzer vertrauen bereits auf unsere Betreuung. 
+            Über 400 zufriedene Tierbesitzer vertrauen bereits auf unsere Betreuung.
             Lesen Sie, was unsere Kunden über uns sagen.
           </p>
           <div className="flex items-center justify-center gap-2 text-sage-600">
@@ -90,7 +90,7 @@ export default function KundenstimmenPage() {
                 <Star key={i} className="h-6 w-6 text-yellow-400 fill-current" />
               ))}
             </div>
-            <span className="font-semibold">4.9/5 Sterne</span>
+            <span className="font-semibold">5.0/5 Sterne</span>
             <span className="text-sage-500">• {testimonials.length}+ Bewertungen</span>
           </div>
         </div>
@@ -142,11 +142,11 @@ export default function KundenstimmenPage() {
             Möchten Sie auch eine Bewertung hinterlassen?
           </h2>
           <p className="text-lg text-sage-700 mb-8">
-            Ihre Erfahrungen sind uns wichtig! Teilen Sie anderen Tierbesitzern mit, 
+            Ihre Erfahrungen sind uns wichtig! Teilen Sie anderen Tierbesitzern mit,
             wie wir Ihnen und Ihrem Liebling geholfen haben.
           </p>
           <div className="flex justify-center">
-            <Button 
+            <Button
               onClick={() => setShowReviewModal(true)}
               className="bg-sage-600 hover:bg-sage-700 text-white"
               size="lg"
@@ -159,9 +159,9 @@ export default function KundenstimmenPage() {
       </section>
 
       {/* Review Modal */}
-      <ReviewModal 
-        isOpen={showReviewModal} 
-        onClose={() => setShowReviewModal(false)} 
+      <ReviewModal
+        isOpen={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
       />
     </div>
   )
