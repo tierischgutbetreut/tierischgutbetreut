@@ -96,14 +96,14 @@ export default function ImpressumPage() {
                 <div>
                   <h3 className="font-semibold text-sage-800 mb-2">Firmenname</h3>
                   <p className="text-gray-700">
-                    <strong>tierisch gut betreut UG</strong> (haftungsbeschränkt)
+                    <strong>tierisch gut betreut Gesellschaft mit beschränkter Haftung</strong>
                   </p>
                 </div>
                 
                 <div>
                   <h3 className="font-semibold text-sage-800 mb-2 flex items-center gap-2">
                     <Users className="h-4 w-4" />
-                    Geschäftsführung
+                    vertretungsberechtigte Geschäftsführer
                   </h3>
                   <p className="text-gray-700">
                     Tamara Pfaff & Gabriel Haaga
@@ -118,6 +118,23 @@ export default function ImpressumPage() {
                   <p className="text-gray-700">
                     Iznangerstr. 32<br />
                     78345 Moos
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-sage-800 mb-2 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Registereintrag
+                  </h3>
+                  <p className="text-gray-700">
+                    HRB 727466 / Amtsgericht Freiburg i. Br.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-sage-800 mb-2">USt.-ID</h3>
+                  <p className="text-gray-700">
+                    DE355611953
                   </p>
                 </div>
               </CardContent>

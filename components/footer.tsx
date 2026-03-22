@@ -102,7 +102,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="border-t border-sage-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-sage-400">
-          <div>© 2025 Tierisch Gut Betreut UG (haftungsbeschränkt). Alle Rechte vorbehalten.</div>
+          <div>© 2025 tierisch gut betreut GmbH. Alle Rechte vorbehalten.</div>
           <div className="flex gap-6 mt-4 md:mt-0">
             <Link href="/login" className="hover:text-white transition-colors">
               Login
