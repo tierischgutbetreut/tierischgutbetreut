@@ -24,29 +24,16 @@ const nextConfig = {
         destination: '/',
         permanent: true,
       },
-      {
-        source: '/Hundepension/:path*',
-        destination: '/hundepension',
-        permanent: true,
-      },
+      // Hundepension / Katzenbetreuung / Kundenstimmen: siehe middleware.ts
+      // (next.config-Redirects matchen auf Vercel case-insensitiv → 308-Schleife auf /hundepension etc.)
       {
         source: '/Unsere-Leistungen/:path*',
         destination: '/#leistungen',
         permanent: true,
       },
       {
-        source: '/Kundenstimmen/:path*',
-        destination: '/kundenstimmen',
-        permanent: true,
-      },
-      {
         source: '/SeminareWorkshops/:path*',
         destination: '/',
-        permanent: true,
-      },
-      {
-        source: '/Katzenbetreuung/:path*',
-        destination: '/katzenbetreuung',
         permanent: true,
       },
     ]
