@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast'
 import Link from 'next/link'
 import type { Contact, ContactNote } from '@/lib/types'
 import { PropertyEditor } from '@/components/admin/property-editor'
+import { TransactionalEmailPanel } from '@/components/admin/transactional-email-panel'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
 export default function LeadDetailPage() {
@@ -367,7 +368,10 @@ export default function LeadDetailPage() {
               </p>
             </div>
             <div className="border-t pt-4 space-y-3">
-              <h3 className="font-semibold">E-Mail-Versand</h3>
+              <h3 className="font-semibold">Transaktionale E-Mails (automatisch)</h3>
+              <p className="text-xs text-sage-500">
+                System-E-Mails bei Lead-Eingang (automatisch).
+              </p>
               <div>
                 <Label>Interne Benachrichtigung</Label>
                 <p className={lead.email_internal_status === 'sent' ? 'text-green-700' : 'text-amber-700'}>
@@ -484,6 +488,12 @@ export default function LeadDetailPage() {
           </CardContent>
         </Card>
       </div>
+
+      <TransactionalEmailPanel
+        contactId={leadId}
+        recipientEmail={lead.email}
+        recipientName={[lead.vorname, lead.nachname].filter(Boolean).join(' ') || lead.email}
+      />
 
       {/* Eigenschaften */}
       <div className="mt-6">

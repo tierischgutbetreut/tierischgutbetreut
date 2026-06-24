@@ -11,6 +11,7 @@ import { ArrowLeft, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import type { Customer, Pet, Document, BookingRequest } from '@/lib/types'
 import { PropertyEditor } from '@/components/admin/property-editor'
+import { TransactionalEmailPanel } from '@/components/admin/transactional-email-panel'
 import { useToast } from '@/hooks/use-toast'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 
@@ -371,6 +372,11 @@ export default function CustomerDetailPage() {
 
         {/* Notizen & Tiere & Dokumente */}
         <div className="space-y-6">
+          <TransactionalEmailPanel
+            contactId={customerId}
+            recipientEmail={customer.email}
+            recipientName={[customer.vorname, customer.nachname].filter(Boolean).join(' ') || customer.email}
+          />
           {/* Notizen */}
           <Card>
             <CardHeader>

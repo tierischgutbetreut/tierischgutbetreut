@@ -56,6 +56,7 @@ export interface Contact {
   email_internal_error: string | null
   email_confirmation_status: 'sent' | 'failed' | null
   email_confirmation_error: string | null
+  newsletter_unsubscribed_at: string | null
 }
 
 /** Alias — Kunden sind `contacts` mit contact_type customer */
@@ -260,4 +261,89 @@ export interface CalendarDay {
     max: number
     serviceType?: ServiceType | null
   }
+}
+
+// Newsletter Types
+export type NewsletterCampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'failed' | 'cancelled'
+export type NewsletterSendLogStatus = 'sent' | 'failed' | 'skipped_unsubscribed'
+
+export interface NewsletterRecipientConfig {
+  groups: string[]
+  contactIds: string[]
+}
+
+export interface NewsletterCampaignStats {
+  sent: number
+  failed: number
+  skipped: number
+}
+
+export interface NewsletterTopic {
+  id: string
+  name: string
+  description: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface NewsletterTemplate {
+  id: string
+  name: string
+  subject_template: string
+  preview_text: string | null
+  html_body: string
+  created_at: string
+  updated_at: string
+}
+
+export interface NewsletterCampaign {
+  id: string
+  subject: string
+  preview_text: string | null
+  html_body: string
+  plain_text: string | null
+  from_address: string | null
+  reply_to: string | null
+  topic_id: string | null
+  recipient_config: NewsletterRecipientConfig
+  status: NewsletterCampaignStatus
+  scheduled_at: string | null
+  sent_at: string | null
+  created_by: string | null
+  stats: NewsletterCampaignStats
+  created_at: string
+  updated_at: string
+  topic?: NewsletterTopic | null
+}
+
+export interface NewsletterSendLog {
+  id: string
+  campaign_id: string
+  contact_id: string | null
+  email: string
+  status: NewsletterSendLogStatus
+  error_message: string | null
+  created_at: string
+}
+
+export type ContactEmailDirection = 'outbound' | 'inbound'
+export type ContactEmailStatus = 'sent' | 'failed' | 'received'
+
+export interface ContactEmail {
+  id: string
+  contact_id: string
+  direction: ContactEmailDirection
+  to_email: string
+  from_email: string
+  subject: string
+  body_text: string
+  status: ContactEmailStatus
+  error_message: string | null
+  message_id: string | null
+  in_reply_to: string | null
+  sent_by: string | {
+    email: string
+  } | null
+  created_at: string
 }

@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer'
-import { getResendClient, getResendFrom, isResendConfigured } from '@/lib/resend-client'
 
 export type LeadEmailData = {
   name: string
@@ -30,14 +29,27 @@ export type LeadEmailDeliveries = {
   confirmation: EmailDelivery
 }
 
-export type EmailTransport = 'resend' | 'smtp'
+export async function sendOnboardingEmail(data: { email: string; name: string; onboardingUrl: string }): Promise<EmailDelivery> {
+  try {
+    const config = getSmtpConfig()
+    const transporter = nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      auth: { user: config.user, pass: config.password },
+    })
 
-export type SendEmailOptions = {
-  to: string
-  subject: string
-  html: string
-  text: string
-  replyTo?: string
+    await transporter.sendMail({
+      from: config.from,
+      to: data.email,
+      subject: 'Dein Zugang zum Kundenportal von tierisch gut betreut',
+      text: `Hallo ${data.name},\n\nwillkommen bei tierisch gut betreut. Über diesen Link kannst du dein Kundenkonto einrichten:\n${data.onboardingUrl}\n\nDer Link ist sieben Tage gültig.\n\nHerzliche Grüße\nTamara und Gabriel`,
+      html: `<p>Hallo ${escapeHtml(data.name)},</p><p>willkommen bei tierisch gut betreut. Über diesen Link kannst du dein Kundenkonto einrichten:</p><p><a href="${escapeHtml(data.onboardingUrl)}">Kundenkonto einrichten</a></p><p>Der Link ist sieben Tage gültig.</p><p>Herzliche Grüße<br>Tamara und Gabriel</p>`,
+    })
+    return { status: 'sent', error: null }
+  } catch (error) {
+    return { status: 'failed', error: error instanceof Error ? error.message : 'Interner SMTP-Fehler' }
+  }
 }
 
 type SmtpConfig = {
@@ -149,112 +161,37 @@ function internalText(data: LeadEmailData): string {
   ].filter((line) => line !== null).join('\n')
 }
 
-async function sendViaResend(options: SendEmailOptions): Promise<EmailDelivery> {
+export async function sendLeadEmails(data: LeadEmailData): Promise<LeadEmailDeliveries> {
+  let config: SmtpConfig
+
   try {
-    const resend = getResendClient()
-    const { error } = await resend.emails.send({
-      from: getResendFrom(),
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-      replyTo: options.replyTo,
-    })
-
-    if (error) {
-      return { status: 'failed', error: error.message }
-    }
-
-    return { status: 'sent', error: null }
+    config = getSmtpConfig()
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'SMTP-Konfiguration ist ungültig'
     return {
-      status: 'failed',
-      error: error instanceof Error ? error.message : 'E-Mail-Versand fehlgeschlagen',
-    }
-  }
-}
-
-async function sendViaSmtp(options: SendEmailOptions): Promise<EmailDelivery> {
-  try {
-    const config = getSmtpConfig()
-    const transporter = nodemailer.createTransport({
-      host: config.host,
-      port: config.port,
-      secure: config.secure,
-      auth: { user: config.user, pass: config.password },
-    })
-
-    await transporter.sendMail({
-      from: config.from,
-      to: options.to,
-      replyTo: options.replyTo,
-      subject: options.subject,
-      text: options.text,
-      html: options.html,
-    })
-
-    return { status: 'sent', error: null }
-  } catch (error) {
-    return {
-      status: 'failed',
-      error: error instanceof Error ? error.message : 'E-Mail-Versand fehlgeschlagen',
-    }
-  }
-}
-
-export async function sendEmail(
-  options: SendEmailOptions
-): Promise<EmailDelivery & { transport: EmailTransport }> {
-  if (isResendConfigured()) {
-    const resendResult = await sendViaResend(options)
-    if (resendResult.status === 'sent') {
-      return { ...resendResult, transport: 'resend' }
-    }
-
-    const smtpResult = await sendViaSmtp(options)
-    if (smtpResult.status === 'sent') {
-      return { ...smtpResult, transport: 'smtp' }
-    }
-
-    return {
-      status: 'failed',
-      error: `Resend: ${resendResult.error}; SMTP: ${smtpResult.error}`,
-      transport: 'smtp',
+      internal: { status: 'failed', error: message },
+      confirmation: { status: 'failed', error: message },
     }
   }
 
-  const smtpResult = await sendViaSmtp(options)
-  return { ...smtpResult, transport: 'smtp' }
-}
-
-export async function sendOnboardingEmail(data: { email: string; name: string; onboardingUrl: string }): Promise<EmailDelivery> {
-  const result = await sendEmail({
-    to: data.email,
-    subject: 'Dein Zugang zum Kundenportal von tierisch gut betreut',
-    text: `Hallo ${data.name},\n\nwillkommen bei tierisch gut betreut. Über diesen Link kannst du dein Kundenkonto einrichten:\n${data.onboardingUrl}\n\nDer Link ist sieben Tage gültig.\n\nHerzliche Grüße\nTamara und Gabriel`,
-    html: `<p>Hallo ${escapeHtml(data.name)},</p><p>willkommen bei tierisch gut betreut. Über diesen Link kannst du dein Kundenkonto einrichten:</p><p><a href="${escapeHtml(data.onboardingUrl)}">Kundenkonto einrichten</a></p><p>Der Link ist sieben Tage gültig.</p><p>Herzliche Grüße<br>Tamara und Gabriel</p>`,
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
+    auth: { user: config.user, pass: config.password },
   })
 
-  return { status: result.status, error: result.error }
-}
-
-export async function sendLeadEmails(data: LeadEmailData): Promise<LeadEmailDeliveries> {
   const fullName = [data.vorname, data.name].filter(Boolean).join(' ')
   const service = serviceLabel(data.service)
 
-  let internalTo: string
-  try {
-    internalTo = getSmtpConfig().to
-  } catch {
-    internalTo = process.env.SMTP_TO || 'info@tierischgutbetreut.de'
-  }
-
-  const internal = await sendEmail({
-    to: internalTo,
-    replyTo: data.email,
-    subject: `Neue Lead-Anfrage: ${fullName || data.email}`,
-    text: internalText(data),
-    html: `
+  const internal = await transporter
+    .sendMail({
+      from: config.from,
+      to: config.to,
+      replyTo: data.email,
+      subject: `Neue Lead-Anfrage: ${fullName || data.email}`,
+      text: internalText(data),
+      html: `
         <h2>Neue Lead-Anfrage</h2>
         <h3>Kontaktdaten</h3>
         <ul>
@@ -269,25 +206,32 @@ export async function sendLeadEmails(data: LeadEmailData): Promise<LeadEmailDeli
         <h3>Beste Erreichbarkeit</h3>
         <p>${toHtml(data.availability)}</p>
       `,
-  })
+    })
+    .then((): EmailDelivery => ({ status: 'sent', error: null }))
+    .catch((error: unknown): EmailDelivery => ({
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Interner SMTP-Fehler',
+    }))
 
-  const confirmation = await sendEmail({
-    to: data.email,
-    subject: 'Deine Anfrage bei tierisch gut betreut GmbH',
-    text: [
-      `Hallo${fullName ? ` ${fullName}` : ''},`,
-      '',
-      'vielen Dank für Deine Anfrage. Wir haben sie erhalten und melden uns so schnell wie möglich bei Dir.',
-      '',
-      'Zusammenfassung Deiner Anfrage:',
-      `Leistung: ${service}`,
-      `Nachricht: ${data.message}`,
-      `Beste Erreichbarkeit: ${data.availability}`,
-      '',
-      'Herzliche Grüße',
-      'Tamara und Gabriel von tierisch gut betreut GmbH',
-    ].join('\n'),
-    html: `
+  const confirmation = await transporter
+    .sendMail({
+      from: config.from,
+      to: data.email,
+      subject: 'Deine Anfrage bei tierisch gut betreut GmbH',
+      text: [
+        `Hallo${fullName ? ` ${fullName}` : ''},`,
+        '',
+        'vielen Dank für Deine Anfrage. Wir haben sie erhalten und melden uns so schnell wie möglich bei Dir.',
+        '',
+        'Zusammenfassung Deiner Anfrage:',
+        `Leistung: ${service}`,
+        `Nachricht: ${data.message}`,
+        `Beste Erreichbarkeit: ${data.availability}`,
+        '',
+        'Herzliche Grüße',
+        'Tamara und Gabriel von tierisch gut betreut GmbH',
+      ].join('\n'),
+      html: `
         <p>Hallo${fullName ? ` ${escapeHtml(fullName)}` : ''},</p>
         <p>vielen Dank für Deine Anfrage. Wir haben sie erhalten und melden uns so schnell wie möglich bei Dir.</p>
         <h3>Zusammenfassung Deiner Anfrage</h3>
@@ -298,23 +242,113 @@ export async function sendLeadEmails(data: LeadEmailData): Promise<LeadEmailDeli
         </ul>
         <p>Herzliche Grüße<br>Tamara und Gabriel von tierisch gut betreut GmbH</p>
       `,
-  })
+    })
+    .then((): EmailDelivery => ({ status: 'sent', error: null }))
+    .catch((error: unknown): EmailDelivery => ({
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Interner SMTP-Fehler',
+    }))
 
+  return { internal, confirmation }
+}
+
+export type NewsletterEmailOptions = {
+  to: string
+  subject: string
+  html: string
+  text: string
+  replyTo?: string
+  previewText?: string
+  unsubscribeUrl?: string
+  listUnsubscribeUrl?: string
+}
+
+export function createSmtpTransporter() {
+  const config = getSmtpConfig()
   return {
-    internal: { status: internal.status, error: internal.error },
-    confirmation: { status: confirmation.status, error: confirmation.error },
+    config,
+    transporter: nodemailer.createTransport({
+      host: config.host,
+      port: config.port,
+      secure: config.secure,
+      auth: { user: config.user, pass: config.password },
+    }),
   }
 }
 
-export async function sendTestEmail(): Promise<EmailDelivery & { transport: EmailTransport; to: string }> {
-  const to = process.env.RESEND_TEST_TO?.trim() || 'dev@tigube.de'
+export type TransactionalContactEmailOptions = {
+  to: string
+  subject: string
+  text: string
+  replyTo?: string
+}
 
-  const result = await sendEmail({
-    to,
-    subject: 'Hello World',
-    html: '<p>Congrats on sending your <strong>first email</strong>!</p>',
-    text: 'Congrats on sending your first email!',
-  })
+export type TransactionalContactEmailResult = EmailDelivery & {
+  messageId: string | null
+}
 
-  return { ...result, to }
+function generateMessageId(): string {
+  const domain = process.env.SMTP_FROM?.split('@')[1] || 'tierischgutbetreut.de'
+  return `<${crypto.randomUUID()}@${domain}>`
+}
+
+export async function sendTransactionalContactEmail(
+  options: TransactionalContactEmailOptions
+): Promise<TransactionalContactEmailResult> {
+  const messageId = generateMessageId()
+  const signature = '\n\nHerzliche Grüße\nTamara und Gabriel · tierisch gut betreut GmbH'
+  const textBody = `${options.text.trim()}${signature}`
+
+  try {
+    const { config, transporter } = createSmtpTransporter()
+
+    await transporter.sendMail({
+      from: config.from,
+      to: options.to,
+      replyTo: options.replyTo || config.from,
+      subject: options.subject.trim(),
+      text: textBody,
+      html: `<p>${toHtml(options.text.trim())}</p><p>Herzliche Grüße<br>Tamara und Gabriel · tierisch gut betreut GmbH</p>`,
+      headers: {
+        'Message-ID': messageId,
+      },
+    })
+
+    return { status: 'sent', error: null, messageId }
+  } catch (error) {
+    return {
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Interner SMTP-Fehler',
+      messageId: null,
+    }
+  }
+}
+
+export async function sendNewsletterEmail(options: NewsletterEmailOptions): Promise<EmailDelivery> {
+  try {
+    const { config, transporter } = createSmtpTransporter()
+    const headers: Record<string, string> = {}
+
+    if (options.listUnsubscribeUrl) {
+      headers['List-Unsubscribe'] = `<${options.listUnsubscribeUrl}>`
+      headers['List-Unsubscribe-Post'] = 'List-Unsubscribe=One-Click'
+    }
+
+    await transporter.sendMail({
+      from: config.from,
+      to: options.to,
+      replyTo: options.replyTo,
+      subject: options.subject,
+      text: options.text,
+      html: options.html,
+      headers,
+    })
+
+    return { status: 'sent', error: null }
+  } catch (error) {
+    return {
+      status: 'failed',
+      error: error instanceof Error ? error.message : 'Interner SMTP-Fehler',
+    }
+  }
 }
