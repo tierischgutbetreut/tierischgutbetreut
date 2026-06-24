@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
       .from('contacts')
       .update({ user_id: createdUser.user.id, status: 'active', onboarding_completed: false })
       .eq('id', customer.id)
-      .eq('user_id', null)
+      .is('user_id', null)
 
     if (linkError) {
       await supabaseAdmin.auth.admin.deleteUser(createdUser.user.id)
@@ -97,4 +97,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-
